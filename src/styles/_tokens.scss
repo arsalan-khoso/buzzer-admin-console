@@ -1,18 +1,32 @@
-// Buzzer design tokens. Every component reads colours, spacing and type from here.
+// Buzzer design tokens (Figma "Public layouts (WEB)" → Design System → colors, Fonts).
+// Every component reads colours, spacing and type from here.
 :root {
+  // Palette from Figma
+  --color-dark: #131515;
+  --color-dark-lighter: #212121;
+  --color-yellow: #ffb414;
+  --color-red: #ec193c;
+  --color-white: #ffffff;
+  --color-gray: #3e3e3e;
+  --color-green: #2ed368;
+  --color-orange: #ff5b14;
+
   // Surfaces
-  --color-surface: #131515;
-  --color-surface-2: #212121;
-  --color-surface-3: #2b2e2e;
+  --color-surface: var(--color-dark);
+  --color-surface-2: var(--color-dark-lighter);
+  --color-surface-3: #2a2c2c;
   --color-surface-overlay: rgba(19, 21, 21, 0.75);
-  --color-page: #0e0f0f;
+  --color-page: var(--color-dark);
 
   // Accents
-  --color-accent: #ffb414;
+  --color-accent: var(--color-yellow);
   --color-accent-hover: #ffc443;
-  --color-danger: #ec193c;
-  --color-success: #2ed368;
-  --color-on-accent: #131515;
+  --color-primary: var(--color-red);
+  --color-primary-hover: #f23a58;
+  --color-danger: var(--color-red);
+  --color-success: var(--color-green);
+  --color-warning: var(--color-orange);
+  --color-on-accent: var(--color-dark);
 
   // Text
   --color-text: #ffffff;
@@ -25,7 +39,7 @@
   --color-focus: var(--color-accent);
 
   // Typography
-  --font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-family: 'Poppins', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-size-xs: 12px;
   --font-size-sm: 13px;
   --font-size-md: 14px;
@@ -56,7 +70,7 @@
   // Layout
   --control-height: 40px;
   --header-height: 64px;
-  --sidebar-width: 248px;
+  --sidebar-width: 264px;
   --sidebar-width-collapsed: 72px;
   --backdrop-blur: blur(16px);
   --transition-fast: 0.15s ease;

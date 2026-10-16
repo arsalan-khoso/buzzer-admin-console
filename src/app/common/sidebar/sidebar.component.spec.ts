@@ -32,4 +32,18 @@ describe('SidebarComponent', () => {
     expect(element.querySelector('.sidebar--collapsed')).toBeTruthy();
     expect(element.querySelector('.sidebar__group-label')).toBeNull();
   });
+
+  it('should hide a group links when its header is clicked', async () => {
+    const fixture = TestBed.createComponent(SidebarComponent);
+    await fixture.whenStable();
+    const element = fixture.nativeElement as HTMLElement;
+    const linksBefore = element.querySelectorAll('.sidebar__link').length;
+
+    element.querySelector<HTMLButtonElement>('.sidebar__group-header')?.click();
+    await fixture.whenStable();
+
+    expect(element.querySelectorAll('.sidebar__link').length).toBe(
+      linksBefore - NAV_GROUPS[0].items.length,
+    );
+  });
 });

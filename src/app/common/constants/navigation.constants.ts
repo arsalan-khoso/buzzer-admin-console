@@ -2,34 +2,35 @@ import { NavGroup } from '../models/nav.model';
 
 export const ICONS_PATH = 'assets/icons';
 
+// Groups come from the task doc; items and icons from the Figma sidebar.
 export const NAV_GROUPS: NavGroup[] = [
   {
     label: 'Match Management',
     items: [
-      { label: 'Sport Management', route: '/sports', icon: 'ic_sports' },
-      { label: 'Matches', route: '/matches', icon: 'ic_match' },
-      { label: 'Competitions', route: '/competitions', icon: 'ic_trophy' },
+      { label: 'Dashboard', route: '/dashboard', icon: 'ic_dashboard' },
+      { label: 'Sports', route: '/sports', icon: 'ic_sports', pageTitle: 'Sport Management' },
     ],
   },
   {
     label: 'Publishing',
     items: [
-      { label: 'Content', route: '/content', icon: 'ic_publish' },
-      { label: 'Notifications', route: '/notifications', icon: 'ic_bell' },
+      { label: 'Verifications', route: '/verifications', icon: 'ic_verifications' },
+      { label: 'Videos', route: '/videos', icon: 'ic_videos' },
+      { label: 'Athlete Blog Requests', route: '/blog-requests', icon: 'ic_blog_requests' },
     ],
   },
   {
     label: 'Finance',
-    items: [
-      { label: 'Payouts', route: '/payouts', icon: 'ic_wallet' },
-      { label: 'Transactions', route: '/transactions', icon: 'ic_receipt' },
-    ],
+    items: [{ label: 'Referrals', route: '/referrals', icon: 'ic_referrals' }],
   },
   {
     label: 'System',
     items: [
       { label: 'Users', route: '/users', icon: 'ic_users' },
-      { label: 'Settings', route: '/settings', icon: 'ic_settings' },
+      { label: 'Registrations', route: '/registrations', icon: 'ic_registrations' },
+      { label: 'Reporting', route: '/reporting', icon: 'ic_reporting' },
+      { label: 'Restricted Devices', route: '/restricted-devices', icon: 'ic_restricted_devices' },
+      { label: 'Restricted Words', route: '/restricted-words', icon: 'ic_restricted_words' },
     ],
   },
 ];

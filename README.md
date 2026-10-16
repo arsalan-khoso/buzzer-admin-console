@@ -54,11 +54,13 @@ Tokens live in `src/styles/_tokens.scss` and every component reads from them:
 | --------------------------------------- | --------------------- |
 | `--color-surface` / `--color-surface-2` | `#131515` / `#212121` |
 | `--color-accent` (yellow)               | `#FFB414`             |
+| `--color-primary` (red, primary button) | `#EC193C`             |
+| `--color-gray` / `--color-orange`       | `#3E3E3E` / `#FF5B14` |
 | `--color-danger` (red)                  | `#EC193C`             |
 | `--color-success` (green)               | `#2ED368`             |
 | `--color-text`                          | `#FFFFFF`             |
 
-Type uses Inter. Shared `.btn`, `.input` and `.tag` styles are in `src/styles/_controls.scss`.
+Type uses Poppins (Figma Fonts frame). Buttons follow Figma: outlined by default, red primary, gray when disabled. Shared `.btn`, `.input` and `.tag` styles are in `src/styles/_controls.scss`.
 
 ## Environment
 

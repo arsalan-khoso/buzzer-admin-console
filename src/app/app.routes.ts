@@ -3,7 +3,7 @@ import { NAV_GROUPS } from './common/constants/navigation.constants';
 
 const sectionRoutes: Routes = NAV_GROUPS.flatMap((group) => group.items).map((item) => ({
   path: item.route.slice(1),
-  title: item.label,
+  title: item.pageTitle ?? item.label,
   loadComponent: () =>
     import('./common/components/placeholder-page/placeholder-page.component').then(
       (m) => m.PlaceholderPage,
