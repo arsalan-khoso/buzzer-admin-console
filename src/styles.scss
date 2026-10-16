@@ -1,1 +1,4 @@
-/* You can add global styles to this file, and also import other style files */
+// Global styles: design tokens, dark theme base and shared controls.
+@use 'styles/tokens';
+@use 'styles/base';
+@use 'styles/controls';
