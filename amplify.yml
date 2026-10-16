@@ -1,0 +1,18 @@
+version: 1
+frontend:
+  phases:
+    preBuild:
+      commands:
+        - nvm install 24
+        - nvm use 24
+        - HUSKY=0 npm ci
+    build:
+      commands:
+        - npm run build
+  artifacts:
+    baseDirectory: dist/buzzer-admin-console/browser
+    files:
+      - '**/*'
+  cache:
+    paths:
+      - .npm/**/*
