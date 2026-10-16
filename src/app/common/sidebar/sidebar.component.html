@@ -1,0 +1,59 @@
+<aside class="sidebar" [class.sidebar--collapsed]="isCollapsed()">
+  <div class="sidebar__brand">
+    @if (!isCollapsed()) {
+      <a routerLink="/" class="sidebar__logo">Buzzer<span class="sidebar__logo-dot">.</span></a>
+    }
+    <button
+      type="button"
+      class="sidebar__toggle"
+      (click)="toggle()"
+      [attr.aria-label]="isCollapsed() ? 'Expand sidebar' : 'Collapse sidebar'"
+      [attr.aria-expanded]="!isCollapsed()"
+    >
+      <img
+        [src]="iconsPath + (isCollapsed() ? '/ic_menu.svg' : '/ic_chevron_left.svg')"
+        width="20"
+        height="20"
+        alt=""
+        aria-hidden="true"
+      />
+    </button>
+  </div>
+
+  <nav class="sidebar__nav" aria-label="Main navigation">
+    @for (group of navGroups; track group.label) {
+      <div class="sidebar__group">
+        @if (!isCollapsed()) {
+          <p class="sidebar__group-label">{{ group.label }}</p>
+        } @else {
+          <hr class="sidebar__divider" />
+        }
+        <ul class="sidebar__list">
+          @for (item of group.items; track item.route) {
+            <li>
+              <a
+                class="sidebar__link"
+                [routerLink]="item.route"
+                routerLinkActive="sidebar__link--active"
+                ariaCurrentWhenActive="page"
+                [attr.title]="isCollapsed() ? item.label : null"
+              >
+                <img
+                  class="sidebar__icon"
+                  [src]="iconsPath + '/' + item.icon + '.svg'"
+                  width="20"
+                  height="20"
+                  alt=""
+                  aria-hidden="true"
+                />
+                <span [class]="isCollapsed() ? 'sidebar__sr-only' : 'sidebar__label'">
+                  {{ item.label }}
+                </span>
+              </a>
+            </li>
+          }
+        </ul>
+      </div>
+    }
+  </nav>
+</aside>
