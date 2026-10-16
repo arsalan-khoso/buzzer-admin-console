@@ -17,13 +17,13 @@ npm install
 npm start          # http://localhost:4200
 ```
 
-| Script | What it does |
-| --- | --- |
-| `npm start` | Dev server with `environment.development.ts` |
-| `npm run build` | Production build into `dist/buzzer-admin-console/browser` |
-| `npm test` | Unit tests (Vitest) |
-| `npm run lint` | ESLint for TypeScript and templates |
-| `npm run format` | Prettier on `src/` |
+| Script           | What it does                                              |
+| ---------------- | --------------------------------------------------------- |
+| `npm start`      | Dev server with `environment.development.ts`              |
+| `npm run build`  | Production build into `dist/buzzer-admin-console/browser` |
+| `npm test`       | Unit tests (Vitest)                                       |
+| `npm run lint`   | ESLint for TypeScript and templates                       |
+| `npm run format` | Prettier on `src/`                                        |
 
 ## Project structure
 
@@ -50,13 +50,13 @@ Naming follows the developer guide: `name.component.ts`, `name.service.ts`, `nam
 
 Tokens live in `src/styles/_tokens.scss` and every component reads from them:
 
-| Token | Value |
-| --- | --- |
+| Token                                   | Value                 |
+| --------------------------------------- | --------------------- |
 | `--color-surface` / `--color-surface-2` | `#131515` / `#212121` |
-| `--color-accent` (yellow) | `#FFB414` |
-| `--color-danger` (red) | `#EC193C` |
-| `--color-success` (green) | `#2ED368` |
-| `--color-text` | `#FFFFFF` |
+| `--color-accent` (yellow)               | `#FFB414`             |
+| `--color-danger` (red)                  | `#EC193C`             |
+| `--color-success` (green)               | `#2ED368`             |
+| `--color-text`                          | `#FFFFFF`             |
 
 Type uses Inter. Shared `.btn`, `.input` and `.tag` styles are in `src/styles/_controls.scss`.
 
