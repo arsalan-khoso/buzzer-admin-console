@@ -1,0 +1,77 @@
+// Buzzer design tokens (Figma "Public layouts (WEB)" → Design System → colors, Fonts).
+// Every component reads colours, spacing and type from here.
+:root {
+  // Palette from Figma
+  --color-dark: #131515;
+  --color-dark-lighter: #212121;
+  --color-yellow: #ffb414;
+  --color-red: #ec193c;
+  --color-white: #ffffff;
+  --color-gray: #3e3e3e;
+  --color-green: #2ed368;
+  --color-orange: #ff5b14;
+
+  // Surfaces
+  --color-surface: var(--color-dark);
+  --color-surface-2: var(--color-dark-lighter);
+  --color-surface-3: #2a2c2c;
+  --color-surface-overlay: rgba(19, 21, 21, 0.75);
+  --color-page: var(--color-dark);
+
+  // Accents
+  --color-accent: var(--color-yellow);
+  --color-accent-hover: #ffc443;
+  --color-primary: var(--color-red);
+  --color-primary-hover: #f23a58;
+  --color-danger: var(--color-red);
+  --color-success: var(--color-green);
+  --color-warning: var(--color-orange);
+  --color-on-accent: var(--color-dark);
+
+  // Text
+  --color-text: #ffffff;
+  --color-text-muted: rgba(255, 255, 255, 0.6);
+  --color-text-subtle: rgba(255, 255, 255, 0.4);
+
+  // Lines and focus
+  --color-border: rgba(255, 255, 255, 0.1);
+  --color-border-strong: rgba(255, 255, 255, 0.2);
+  --color-focus: var(--color-accent);
+
+  // Typography
+  --font-family: 'Poppins', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-size-xs: 12px;
+  --font-size-sm: 13px;
+  --font-size-md: 14px;
+  --font-size-lg: 16px;
+  --font-size-xl: 20px;
+  --font-size-2xl: 24px;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --line-height: 1.5;
+
+  // Spacing
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+
+  // Shape
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-pill: 999px;
+
+  // Layout
+  --control-height: 40px;
+  --header-height: 64px;
+  --sidebar-width: 264px;
+  --sidebar-width-collapsed: 72px;
+  --backdrop-blur: blur(16px);
+  --transition-fast: 0.15s ease;
+}

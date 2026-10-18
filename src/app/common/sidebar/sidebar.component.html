@@ -1,0 +1,95 @@
+<aside class="sidebar" [class.sidebar--collapsed]="isCollapsed()">
+  <div class="sidebar__brand">
+    <a routerLink="/" class="sidebar__logo" aria-label="Buzzer Admin Console home">
+      <img [src]="iconsPath + '/ic_logo.svg'" width="24" height="24" alt="" aria-hidden="true" />
+      @if (!isCollapsed()) {
+        <span class="sidebar__logo-text">
+          <span class="sidebar__logo-name">Buzzer</span>
+          <span class="sidebar__logo-tagline">Admin Console</span>
+        </span>
+      }
+    </a>
+    <button
+      type="button"
+      class="sidebar__toggle"
+      (click)="toggle()"
+      [attr.aria-label]="isCollapsed() ? 'Expand sidebar' : 'Collapse sidebar'"
+      [attr.aria-expanded]="!isCollapsed()"
+    >
+      <img
+        [src]="iconsPath + (isCollapsed() ? '/ic_sidebar_expand.svg' : '/ic_sidebar.svg')"
+        width="20"
+        height="20"
+        alt=""
+        aria-hidden="true"
+      />
+    </button>
+  </div>
+
+  <nav class="sidebar__nav" aria-label="Main navigation">
+    @for (group of navGroups; track group.label) {
+      <div class="sidebar__group">
+        @if (!isCollapsed()) {
+          <button
+            type="button"
+            class="sidebar__group-header"
+            (click)="toggleGroup(group.label)"
+            [attr.aria-expanded]="isGroupOpen(group.label)"
+          >
+            <span class="sidebar__group-label">{{ group.label }}</span>
+            <img
+              class="sidebar__group-chevron"
+              [class.sidebar__group-chevron--closed]="!isGroupOpen(group.label)"
+              [src]="iconsPath + '/ic_chevron_down.svg'"
+              width="16"
+              height="16"
+              alt=""
+              aria-hidden="true"
+            />
+          </button>
+        } @else {
+          <hr class="sidebar__divider" />
+        }
+        @if (isGroupOpen(group.label)) {
+          <ul class="sidebar__list">
+            @for (item of group.items; track item.route) {
+              <li>
+                <a
+                  class="sidebar__link"
+                  [routerLink]="item.route"
+                  routerLinkActive="sidebar__link--active"
+                  ariaCurrentWhenActive="page"
+                  [attr.title]="isCollapsed() ? item.label : null"
+                >
+                  <img
+                    class="sidebar__icon"
+                    [src]="iconsPath + '/' + item.icon + '.svg'"
+                    width="20"
+                    height="20"
+                    alt=""
+                    aria-hidden="true"
+                  />
+                  <span [class]="isCollapsed() ? 'sidebar__sr-only' : 'sidebar__label'">
+                    {{ item.label }}
+                  </span>
+                </a>
+              </li>
+            }
+          </ul>
+        }
+      </div>
+    }
+  </nav>
+
+  <div class="sidebar__user">
+    <span class="sidebar__avatar" aria-hidden="true">{{ userInitial }}</span>
+    @if (!isCollapsed()) {
+      <div class="sidebar__user-info">
+        <span class="sidebar__user-email">{{ userEmail }}</span>
+        <button type="button" class="sidebar__sign-out" disabled title="Available after login">
+          Sign out
+        </button>
+      </div>
+    }
+  </div>
+</aside>

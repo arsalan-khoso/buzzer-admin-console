@@ -1,59 +1,91 @@
-# BuzzerAdminConsole
+# Buzzer Admin Console
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.2.2.
+Angular admin console for Buzzer sports management: sports catalogue, governing bodies, organisations and participants.
 
-## Development server
+## Stack
 
-To start a local development server, run:
+- Angular 22: standalone components, signals, zoneless change detection, `OnPush` everywhere
+- SCSS with design tokens as CSS custom properties (`src/styles/_tokens.scss`)
+- Vitest for unit tests, ESLint (angular-eslint) and Prettier
+- Husky + commitlint for Conventional Commits
+- Vercel hosting with automatic deploys from `main` and preview deploys for every PR
 
-```bash
-ng serve
-```
-
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+## Getting started
 
 ```bash
-ng generate component component-name
+npm install
+npm start          # http://localhost:4200
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+| Script           | What it does                                              |
+| ---------------- | --------------------------------------------------------- |
+| `npm start`      | Dev server with `environment.development.ts`              |
+| `npm run build`  | Production build into `dist/buzzer-admin-console/browser` |
+| `npm test`       | Unit tests (Vitest)                                       |
+| `npm run lint`   | ESLint for TypeScript and templates                       |
+| `npm run format` | Prettier on `src/`                                        |
 
-```bash
-ng generate --help
+## Project structure
+
+```
+src/
+├── app/
+│   ├── common/                  # Shared across features
+│   │   ├── components/          # header, main-layout, placeholder-page
+│   │   ├── constants/           # navigation and storage keys
+│   │   ├── models/
+│   │   ├── services/            # LayoutService (sidebar state, header search)
+│   │   ├── sidebar/             # Collapsible main navigation
+│   │   └── styles/_shared.scss  # SCSS mixins
+│   ├── core/                    # API config, title strategy
+│   ├── app.config.ts
+│   └── app.routes.ts
+├── environments/                # Backend base URL per build
+└── styles/                      # Tokens, dark theme base, shared controls
 ```
 
-## Building
+Naming follows the developer guide: `name.component.ts`, `name.service.ts`, `name.model.ts`, BEM class names, icons as `public/assets/icons/ic_<name>.svg`.
 
-To build the project run:
+## Design system
 
-```bash
-ng build
-```
+Tokens live in `src/styles/_tokens.scss` and every component reads from them:
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+| Token                                   | Value                 |
+| --------------------------------------- | --------------------- |
+| `--color-surface` / `--color-surface-2` | `#131515` / `#212121` |
+| `--color-accent` (yellow)               | `#FFB414`             |
+| `--color-primary` (red, primary button) | `#EC193C`             |
+| `--color-gray` / `--color-orange`       | `#3E3E3E` / `#FF5B14` |
+| `--color-danger` (red)                  | `#EC193C`             |
+| `--color-success` (green)               | `#2ED368`             |
+| `--color-text`                          | `#FFFFFF`             |
 
-## Running unit tests
+Type uses Poppins (Figma Fonts frame). Buttons follow Figma: outlined by default, red primary, gray when disabled. Shared `.btn`, `.input` and `.tag` styles are in `src/styles/_controls.scss`.
 
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+## Environment
 
-```bash
-ng test
-```
+The backend base URL is read only from `src/environments/`:
 
-## Running end-to-end tests
+- `environment.ts`: production build
+- `environment.development.ts`: `ng serve`
 
-For end-to-end (e2e) testing, run:
+Code injects it through the `API_BASE_URL` token in `core/api.config.ts`.
 
-```bash
-ng e2e
-```
+## Git workflow
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+- `main`: production; every push deploys through Vercel
+- `dev`: integration branch
+- Each task starts fresh from the latest `dev`: `git checkout dev && git pull && git checkout -b feat/<name>`
+- PRs are squash-merged into `dev`, then the branch is deleted
+- Releases go to `main` through a `dev` → `main` PR
+- Commit messages follow Conventional Commits, e.g. `feat(sports): add sport create dialog`
 
-## Additional Resources
+## Deployment (Vercel)
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+CI/CD runs on Vercel with the settings in `vercel.json` (build command, output folder and the single-page-app rewrite so deep links such as `/sports` load Angular). One-time setup:
+
+1. Sign in at [vercel.com](https://vercel.com) with GitHub.
+2. **Add New → Project** → import `buzzer-admin-console`. Vercel reads `vercel.json`; keep the defaults and deploy.
+3. Production branch is `main` (the repo default).
+
+After that, every merge to `main` deploys to production and every PR gets its own preview URL. GitHub Actions (`.github/workflows/ci.yml`) runs lint, tests and build on every PR to `dev` and `main`.
