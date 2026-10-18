@@ -1,6 +1,6 @@
 // Mixins shared by component stylesheets: @use 'common/styles/shared' as *;
 
-@mixin custom-scrollbar($color: rgba(255, 255, 255, 0.2)) {
+@mixin custom-scrollbar($color: var(--color-border-strong)) {
   scrollbar-width: thin;
   scrollbar-color: $color transparent;
 
@@ -15,7 +15,7 @@
 
   &::-webkit-scrollbar-thumb {
     background: $color;
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
   }
 }
 
