@@ -8,7 +8,7 @@ Angular admin console for Buzzer sports management: sports catalogue, governing 
 - SCSS with design tokens as CSS custom properties (`src/styles/_tokens.scss`)
 - Vitest for unit tests, ESLint (angular-eslint) and Prettier
 - Husky + commitlint for Conventional Commits
-- AWS Amplify Hosting with automatic deploys from `main`
+- Vercel hosting with automatic deploys from `main` and preview deploys for every PR
 
 ## Getting started
 
@@ -73,22 +73,19 @@ Code injects it through the `API_BASE_URL` token in `core/api.config.ts`.
 
 ## Git workflow
 
-- `main`: production; every push deploys through Amplify
+- `main`: production; every push deploys through Vercel
 - `dev`: integration branch
 - Each task starts fresh from the latest `dev`: `git checkout dev && git pull && git checkout -b feat/<name>`
 - PRs are squash-merged into `dev`, then the branch is deleted
 - Releases go to `main` through a `dev` → `main` PR
 - Commit messages follow Conventional Commits, e.g. `feat(sports): add sport create dialog`
 
-## Deployment (AWS Amplify)
+## Deployment (Vercel)
 
-CI/CD runs on Amplify Hosting with the build spec in `amplify.yml`. One-time setup in the AWS Console:
+CI/CD runs on Vercel with the settings in `vercel.json` (build command, output folder and the single-page-app rewrite so deep links such as `/sports` load Angular). One-time setup:
 
-1. Amplify → **Create new app** → **GitHub** → authorise and pick `buzzer-admin-console`, branch `main`.
-2. Amplify detects `amplify.yml`; keep it and deploy.
-3. **Hosting → Rewrites and redirects** → add the single-page-app rule so deep links load Angular:
-   - Source: `</^[^.]+$|\.(?!(css|gif|ico|jpg|js|png|txt|svg|woff|woff2|ttf|map|json|webp)$)([^.]+$)/>`
-   - Target: `/index.html`
-   - Type: `200 (Rewrite)`
+1. Sign in at [vercel.com](https://vercel.com) with GitHub.
+2. **Add New → Project** → import `buzzer-admin-console`. Vercel reads `vercel.json`; keep the defaults and deploy.
+3. Production branch is `main` (the repo default).
 
-After that, every merge to `main` builds and deploys automatically. GitHub Actions (`.github/workflows/ci.yml`) runs lint, tests and build on every PR to `dev` and `main`.
+After that, every merge to `main` deploys to production and every PR gets its own preview URL. GitHub Actions (`.github/workflows/ci.yml`) runs lint, tests and build on every PR to `dev` and `main`.
