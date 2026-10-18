@@ -2,6 +2,8 @@
 
 Angular admin console for Buzzer sports management: sports catalogue, governing bodies, organisations and participants.
 
+Live: https://buzzer-admin-console-arsalan.vercel.app
+
 ## Stack
 
 - Angular 22: standalone components, signals, zoneless change detection, `OnPush` everywhere
