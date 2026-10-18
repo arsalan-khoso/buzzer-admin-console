@@ -36,6 +36,11 @@
     min-width: 0;
   }
 
+  &__logo-mark {
+    flex-shrink: 0;
+    border-radius: var(--radius-md);
+  }
+
   &__logo-text {
     display: flex;
     flex-direction: column;
