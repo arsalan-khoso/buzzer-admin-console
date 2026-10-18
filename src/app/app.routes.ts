@@ -17,7 +17,7 @@ export const routes: Routes = [
       import('./common/components/main-layout/main-layout.component').then(
         (m) => m.MainLayoutComponent,
       ),
-    children: [{ path: '', redirectTo: 'sports', pathMatch: 'full' }, ...sectionRoutes],
+    children: [{ path: '', redirectTo: 'dashboard', pathMatch: 'full' }, ...sectionRoutes],
   },
   { path: '**', redirectTo: '' },
 ];
