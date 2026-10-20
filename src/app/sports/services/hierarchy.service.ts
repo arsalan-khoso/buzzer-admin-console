@@ -48,6 +48,17 @@ export class HierarchyService {
     return this.post<GoverningBody>(SPORTS_ENDPOINTS.governingBodies, input);
   }
 
+  updateGoverningBody(
+    id: string,
+    input: { name: string; country?: string },
+  ): Observable<GoverningBody> {
+    return this.patch<GoverningBody>(`${SPORTS_ENDPOINTS.governingBodies}/${id}`, input);
+  }
+
+  deleteGoverningBody(id: string): Observable<void> {
+    return this.remove(`${SPORTS_ENDPOINTS.governingBodies}/${id}`);
+  }
+
   listOrganisations(governingBodyId: string): Observable<Organisation[]> {
     return this.get<Organisation[]>(SPORTS_ENDPOINTS.organisations, {
       governingBodyId,
