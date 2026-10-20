@@ -1,0 +1,14 @@
+<div class="dialog-backdrop"></div>
+<section class="dialog" role="alertdialog" aria-modal="true" aria-labelledby="confirm-title">
+  <h2 id="confirm-title" class="dialog__title">{{ title() }}</h2>
+  <p class="dialog__text">{{ message() }}</p>
+  @if (errorMessage()) {
+    <p class="dialog__error" role="alert">{{ errorMessage() }}</p>
+  }
+  <div class="dialog__actions">
+    <button type="button" class="btn" (click)="cancelled.emit()">Cancel</button>
+    <button type="button" class="btn btn--primary" [disabled]="isBusy()" (click)="confirmed.emit()">
+      {{ confirmLabel() }}
+    </button>
+  </div>
+</section>
