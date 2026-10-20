@@ -1,16 +1,19 @@
 <section class="page">
   <div class="page__toolbar">
     <span class="chip">Sport</span>
-    <button type="button" class="btn btn--small" (click)="openAdd()">
-      <img
-        [src]="iconsPath + '/ic_plus_circle.svg'"
-        width="16"
-        height="16"
-        alt=""
-        aria-hidden="true"
-      />
-      Add Sport
-    </button>
+    <span class="page__actions">
+      <button type="button" class="btn btn--small" (click)="isImportOpen.set(true)">Import</button>
+      <button type="button" class="btn btn--small" (click)="openAdd()">
+        <img
+          [src]="iconsPath + '/ic_plus_circle.svg'"
+          width="16"
+          height="16"
+          alt=""
+          aria-hidden="true"
+        />
+        Add Sport
+      </button>
+    </span>
   </div>
 
   <div class="stat-grid">
@@ -61,7 +64,7 @@
                     {{ sport.name.charAt(0).toUpperCase() }}
                   </span>
                 }
-                {{ sport.name }}
+                <a class="data-table__link" [routerLink]="[sport.id]">{{ sport.name }}</a>
               </span>
             </td>
             <td>{{ sport.governingBodyCount ?? 0 }}</td>
@@ -145,4 +148,8 @@
     (confirmed)="confirmDelete()"
     (cancelled)="deletingSport.set(null)"
   />
+}
+
+@if (isImportOpen()) {
+  <app-bulk-import-dialog (closed)="onImportClosed($event)" />
 }

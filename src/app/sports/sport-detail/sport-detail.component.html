@@ -1,0 +1,95 @@
+<section class="page">
+  <div class="page__toolbar">
+    <app-breadcrumb [items]="breadcrumb()" />
+    <button type="button" class="btn btn--small" (click)="isAddOpen.set(true)">
+      <img
+        [src]="iconsPath + '/ic_plus_circle.svg'"
+        width="16"
+        height="16"
+        alt=""
+        aria-hidden="true"
+      />
+      Add Governing Body
+    </button>
+  </div>
+
+  @if (sport(); as sport) {
+    <header class="detail-header">
+      <div class="detail-header__title">
+        @if (sport.iconUrl) {
+          <img [src]="sport.iconUrl" width="24" height="24" alt="" />
+        }
+        <h2>{{ sport.name }}</h2>
+      </div>
+      @if (sport.description) {
+        <p class="detail-header__text">{{ sport.description }}</p>
+      }
+      <dl class="detail-header__meta">
+        <dt>Created</dt>
+        <dd>{{ sport.createdAt | date: 'MMM d, y, HH:mm' }}</dd>
+        <dt>Updated</dt>
+        <dd>{{ sport.updatedAt | date: 'MMM d, y, HH:mm' }}</dd>
+      </dl>
+    </header>
+  }
+
+  <div class="stat-grid">
+    <div class="stat-card">
+      <span class="stat-card__value">{{ governingBodies().length }}</span>
+      <span class="stat-card__label">Governing Bodies</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-card__value">{{ organisationTotal() }}</span>
+      <span class="stat-card__label">Organisations</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-card__value">{{ participantTotal() }}</span>
+      <span class="stat-card__label">Participants</span>
+    </div>
+  </div>
+
+  <h3>Governing Bodies</h3>
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th scope="col">Governing Body</th>
+          <th scope="col">Country</th>
+          <th scope="col">Organisations</th>
+          <th scope="col">Participants</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (body of governingBodies(); track body.id) {
+          <tr>
+            <td>
+              <a class="data-table__link" [routerLink]="['governing-bodies', body.id]">
+                {{ body.name }}
+              </a>
+            </td>
+            <td>{{ body.country ?? '—' }}</td>
+            <td>{{ body.organizationCount ?? 0 }}</td>
+            <td>{{ body.participantCount ?? 0 }}</td>
+          </tr>
+        } @empty {
+          <tr>
+            <td class="data-table__empty" colspan="4">
+              {{ isLoading() ? 'Loading…' : errorMessage() || 'No governing bodies yet.' }}
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</section>
+
+@if (isAddOpen()) {
+  <app-form-dialog
+    title="Add Governing Body"
+    submitLabel="Add"
+    [fields]="governingBodyFields"
+    [save]="addGoverningBody"
+    (saved)="onAdded()"
+    (closed)="isAddOpen.set(false)"
+  />
+}

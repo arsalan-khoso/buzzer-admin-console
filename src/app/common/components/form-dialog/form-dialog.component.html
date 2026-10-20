@@ -1,0 +1,61 @@
+<div class="dialog-backdrop"></div>
+<section class="dialog" role="dialog" aria-modal="true" aria-labelledby="form-dialog-title">
+  <h2 id="form-dialog-title" class="dialog__title">{{ title() }}</h2>
+
+  <form class="dialog__form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    @for (field of fields(); track field.key) {
+      <div class="field">
+        <label class="field__label" [for]="'field-' + field.key">
+          {{ field.label }}{{ field.required ? '*' : '' }}
+        </label>
+        @switch (field.type) {
+          @case ('textarea') {
+            <textarea
+              class="input"
+              [id]="'field-' + field.key"
+              [formControlName]="field.key"
+            ></textarea>
+          }
+          @case ('select') {
+            <select
+              class="input"
+              [class.input--invalid]="showError(field.key)"
+              [id]="'field-' + field.key"
+              [formControlName]="field.key"
+            >
+              <option value="">Select…</option>
+              @for (option of field.options ?? []; track option.value) {
+                <option [value]="option.value">{{ option.label }}</option>
+              }
+            </select>
+          }
+          @default {
+            <input
+              class="input"
+              [class.input--invalid]="showError(field.key)"
+              [id]="'field-' + field.key"
+              [type]="field.type === 'url' ? 'url' : (field.type ?? 'text')"
+              [formControlName]="field.key"
+            />
+          }
+        }
+        @if (showError(field.key)) {
+          <p class="field__error">
+            {{ field.type === 'url' ? 'Enter a valid URL.' : field.label + ' is required.' }}
+          </p>
+        }
+      </div>
+    }
+
+    @if (errorMessage()) {
+      <p class="dialog__error" role="alert">{{ errorMessage() }}</p>
+    }
+
+    <div class="dialog__actions">
+      <button type="button" class="btn" (click)="closed.emit()">Cancel</button>
+      <button type="submit" class="btn btn--primary" [disabled]="isSaving()">
+        {{ submitLabel() }}
+      </button>
+    </div>
+  </form>
+</section>

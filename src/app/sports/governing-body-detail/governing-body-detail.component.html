@@ -1,0 +1,77 @@
+<section class="page">
+  <div class="page__toolbar">
+    <app-breadcrumb [items]="breadcrumb()" />
+    <button type="button" class="btn btn--small" (click)="isAddOpen.set(true)">
+      <img
+        [src]="iconsPath + '/ic_plus_circle.svg'"
+        width="16"
+        height="16"
+        alt=""
+        aria-hidden="true"
+      />
+      Add Organisation
+    </button>
+  </div>
+
+  @if (governingBody(); as body) {
+    <header class="detail-header">
+      <div class="detail-header__title">
+        <span class="avatar" aria-hidden="true">{{ body.name.charAt(0).toUpperCase() }}</span>
+        <h2>{{ body.name }}</h2>
+      </div>
+      <dl class="detail-header__meta">
+        <dt>Country</dt>
+        <dd>{{ body.country ?? '—' }}</dd>
+        <dt>Created</dt>
+        <dd>{{ body.createdAt | date: 'MMM d, y, HH:mm' }}</dd>
+        <dt>Updated</dt>
+        <dd>{{ body.updatedAt | date: 'MMM d, y, HH:mm' }}</dd>
+      </dl>
+    </header>
+  }
+
+  <h3>Competitions / Organisations</h3>
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th scope="col">Organisation</th>
+          <th scope="col">City</th>
+          <th scope="col">Teams</th>
+          <th scope="col">Participants</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (organisation of organisations(); track organisation.id) {
+          <tr>
+            <td>
+              <a class="data-table__link" [routerLink]="['organisations', organisation.id]">
+                {{ organisation.name }}
+              </a>
+            </td>
+            <td>{{ organisation.city ?? '—' }}</td>
+            <td>{{ organisation.teamCount ?? 0 }}</td>
+            <td>{{ organisation.participantCount ?? 0 }}</td>
+          </tr>
+        } @empty {
+          <tr>
+            <td class="data-table__empty" colspan="4">
+              {{ isLoading() ? 'Loading…' : errorMessage() || 'No organisations yet.' }}
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</section>
+
+@if (isAddOpen()) {
+  <app-form-dialog
+    title="Add Organisation"
+    submitLabel="Add"
+    [fields]="organisationFields"
+    [save]="addOrganisation"
+    (saved)="onAdded()"
+    (closed)="isAddOpen.set(false)"
+  />
+}
