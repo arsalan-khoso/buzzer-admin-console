@@ -45,7 +45,7 @@
           [style.background-color]="swatch()"
           (click)="toggleIconField()"
           [attr.aria-expanded]="isIconFieldOpen()"
-          aria-label="Add icon"
+          aria-label="Add icon and description"
         >
           @if (showsIcon()) {
             <img
@@ -120,6 +120,31 @@
         @if (showError('iconUrl')) {
           <p class="field__error">Enter a valid URL starting with http:// or https://.</p>
         }
+
+        <div class="input-clearable">
+          <input
+            class="input"
+            formControlName="description"
+            placeholder="Description"
+            aria-label="Description"
+          />
+          @if (form.controls.description.value) {
+            <button
+              type="button"
+              class="input-clearable__btn"
+              (click)="clear('description')"
+              aria-label="Clear description"
+            >
+              <img
+                src="assets/icons/ic_clear.svg"
+                width="16"
+                height="16"
+                alt=""
+                aria-hidden="true"
+              />
+            </button>
+          }
+        </div>
       }
     </div>
 

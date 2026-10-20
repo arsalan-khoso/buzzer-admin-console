@@ -21,8 +21,9 @@ const URL_PATTERN = /^https?:\/\/\S+$/;
 
 /**
  * Add/Edit Sport dialog laid out as the Figma "Add Sport" screen: name (emoji allowed) and an
- * icon-and-colour row. The + square opens the icon URL field; the hex field tints the square.
- * The API stores no colour, so the colour only previews; name and icon URL are saved.
+ * icon-and-colour row. The + square opens the icon URL and description fields (the task doc's
+ * Name, Description, Icon URL); the hex field tints the square. The API stores no colour, so the
+ * colour only previews.
  */
 @Component({
   selector: 'app-sport-dialog',
@@ -42,6 +43,7 @@ export class SportDialogComponent implements OnInit {
     name: ['', Validators.required],
     colour: ['', Validators.pattern(HEX_COLOUR)],
     iconUrl: ['', Validators.pattern(URL_PATTERN)],
+    description: [''],
   });
   readonly isSaving = signal(false);
   readonly errorMessage = signal('');
@@ -62,8 +64,12 @@ export class SportDialogComponent implements OnInit {
   ngOnInit(): void {
     const sport = this.sport();
     if (sport) {
-      this.form.patchValue({ name: sport.name, iconUrl: sport.iconUrl ?? '' });
-      this.isIconFieldOpen.set(!!sport.iconUrl);
+      this.form.patchValue({
+        name: sport.name,
+        iconUrl: sport.iconUrl ?? '',
+        description: sport.description ?? '',
+      });
+      this.isIconFieldOpen.set(!!sport.iconUrl || !!sport.description);
     }
   }
 
@@ -71,7 +77,7 @@ export class SportDialogComponent implements OnInit {
     this.isIconFieldOpen.update((open) => !open);
   }
 
-  clear(control: 'name' | 'colour' | 'iconUrl'): void {
+  clear(control: 'name' | 'colour' | 'iconUrl' | 'description'): void {
     this.form.controls[control].setValue('');
   }
 
@@ -85,12 +91,16 @@ export class SportDialogComponent implements OnInit {
     if (this.form.invalid || this.isSaving()) {
       return;
     }
-    const { name, iconUrl } = this.form.getRawValue();
+    const { name, iconUrl, description } = this.form.getRawValue();
+    const sport = this.sport();
     const input: SportInput = { name: name.trim() };
     if (iconUrl.trim()) {
       input.iconUrl = iconUrl.trim();
     }
-    const sport = this.sport();
+    // When editing, always send the description so clearing the field clears it on the server
+    if (description.trim() || sport) {
+      input.description = description.trim();
+    }
     const request = sport
       ? this.sportsService.update(sport.id, input)
       : this.sportsService.create(input);
