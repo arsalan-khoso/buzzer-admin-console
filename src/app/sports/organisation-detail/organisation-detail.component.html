@@ -112,9 +112,11 @@
     @case ('squad') {
       <div class="page__toolbar">
         <h3>Squad</h3>
-        <button type="button" class="btn btn--small" (click)="openAddSquadMember()">
-          Add Squad Member
-        </button>
+        @if (canManageMembers()) {
+          <button type="button" class="btn btn--small" (click)="openAddSquadMember()">
+            Add Squad Member
+          </button>
+        }
       </div>
       <div class="table-wrap">
         <table class="data-table">
@@ -151,34 +153,38 @@
                 <td>{{ member.age ?? '—' }}</td>
                 <td>{{ member.agreementEnd ? (member.agreementEnd | date: 'MMM d, y') : '—' }}</td>
                 <td class="data-table__actions">
-                  <button
-                    type="button"
-                    class="icon-btn"
-                    (click)="openEditSquadMember(member)"
-                    [attr.aria-label]="'Edit ' + member.displayName"
-                  >
-                    <img
-                      [src]="iconsPath + '/ic_edit.svg'"
-                      width="18"
-                      height="18"
-                      alt=""
-                      aria-hidden="true"
-                    />
-                  </button>
-                  <button
-                    type="button"
-                    class="icon-btn"
-                    (click)="askRemoveSquadMember(member)"
-                    [attr.aria-label]="'Remove ' + member.displayName"
-                  >
-                    <img
-                      [src]="iconsPath + '/ic_delete.svg'"
-                      width="18"
-                      height="18"
-                      alt=""
-                      aria-hidden="true"
-                    />
-                  </button>
+                  @if (canManageMembers()) {
+                    <button
+                      type="button"
+                      class="icon-btn"
+                      (click)="openEditSquadMember(member)"
+                      [attr.aria-label]="'Edit ' + member.displayName"
+                    >
+                      <img
+                        [src]="iconsPath + '/ic_edit.svg'"
+                        width="18"
+                        height="18"
+                        alt=""
+                        aria-hidden="true"
+                      />
+                    </button>
+                    <button
+                      type="button"
+                      class="icon-btn"
+                      (click)="askRemoveSquadMember(member)"
+                      [attr.aria-label]="'Remove ' + member.displayName"
+                    >
+                      <img
+                        [src]="iconsPath + '/ic_delete.svg'"
+                        width="18"
+                        height="18"
+                        alt=""
+                        aria-hidden="true"
+                      />
+                    </button>
+                  } @else {
+                    <span class="data-table__muted">View only</span>
+                  }
                 </td>
               </tr>
             } @empty {
@@ -196,9 +202,11 @@
     @case ('staff') {
       <div class="page__toolbar">
         <h3>Staff</h3>
-        <button type="button" class="btn btn--small" (click)="openStaffDialog()">
-          Add Staff Member
-        </button>
+        @if (canManageMembers()) {
+          <button type="button" class="btn btn--small" (click)="openStaffDialog()">
+            Add Staff Member
+          </button>
+        }
       </div>
       @for (group of staffGroups(); track group.category) {
         <h4 class="staff-group__title">{{ staffLabels[group.category] }}</h4>
@@ -235,34 +243,38 @@
                   <td>{{ member.roleTitle }}</td>
                   <td>{{ member.nationality ?? '—' }}</td>
                   <td class="data-table__actions">
-                    <button
-                      type="button"
-                      class="icon-btn"
-                      (click)="openStaffDialog(member)"
-                      [attr.aria-label]="'Edit ' + member.name"
-                    >
-                      <img
-                        [src]="iconsPath + '/ic_edit.svg'"
-                        width="18"
-                        height="18"
-                        alt=""
-                        aria-hidden="true"
-                      />
-                    </button>
-                    <button
-                      type="button"
-                      class="icon-btn"
-                      (click)="askRemoveStaffMember(member)"
-                      [attr.aria-label]="'Remove ' + member.name"
-                    >
-                      <img
-                        [src]="iconsPath + '/ic_delete.svg'"
-                        width="18"
-                        height="18"
-                        alt=""
-                        aria-hidden="true"
-                      />
-                    </button>
+                    @if (canManageMembers()) {
+                      <button
+                        type="button"
+                        class="icon-btn"
+                        (click)="openStaffDialog(member)"
+                        [attr.aria-label]="'Edit ' + member.name"
+                      >
+                        <img
+                          [src]="iconsPath + '/ic_edit.svg'"
+                          width="18"
+                          height="18"
+                          alt=""
+                          aria-hidden="true"
+                        />
+                      </button>
+                      <button
+                        type="button"
+                        class="icon-btn"
+                        (click)="askRemoveStaffMember(member)"
+                        [attr.aria-label]="'Remove ' + member.name"
+                      >
+                        <img
+                          [src]="iconsPath + '/ic_delete.svg'"
+                          width="18"
+                          height="18"
+                          alt=""
+                          aria-hidden="true"
+                        />
+                      </button>
+                    } @else {
+                      <span class="data-table__muted">View only</span>
+                    }
                   </td>
                 </tr>
               } @empty {
