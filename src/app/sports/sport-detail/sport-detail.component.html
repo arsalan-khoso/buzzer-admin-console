@@ -183,8 +183,12 @@
 </section>
 
 @if (isSportFormOpen()) {
-  <app-sport-form-dialog
-    [sport]="sport()"
+  <app-form-dialog
+    title="Edit Sport"
+    [fields]="sportFields"
+    [initialValue]="sportFormValue()"
+    [save]="saveSport"
+    conflictMessage="A sport with this name already exists."
     (saved)="onSaved()"
     (closed)="isSportFormOpen.set(false)"
   />

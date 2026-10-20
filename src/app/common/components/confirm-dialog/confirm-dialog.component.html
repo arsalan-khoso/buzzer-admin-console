@@ -1,6 +1,11 @@
 <div class="dialog-backdrop"></div>
 <section class="dialog" role="alertdialog" aria-modal="true" aria-labelledby="confirm-title">
-  <h2 id="confirm-title" class="dialog__title">{{ title() }}</h2>
+  <div class="dialog__header">
+    <h2 id="confirm-title" class="dialog__title">{{ title() }}</h2>
+    <button type="button" class="dialog__close" (click)="cancelled.emit()" aria-label="Close">
+      <img src="assets/icons/ic_close.svg" width="20" height="20" alt="" aria-hidden="true" />
+    </button>
+  </div>
   <p class="dialog__text">{{ message() }}</p>
   @if (errorMessage()) {
     <p class="dialog__error" role="alert">{{ errorMessage() }}</p>

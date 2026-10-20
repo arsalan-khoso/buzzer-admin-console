@@ -1,12 +1,17 @@
 <div class="dialog-backdrop"></div>
 <section class="dialog" role="dialog" aria-modal="true" aria-labelledby="form-dialog-title">
-  <h2 id="form-dialog-title" class="dialog__title">{{ title() }}</h2>
+  <div class="dialog__header">
+    <h2 id="form-dialog-title" class="dialog__title">{{ title() }}</h2>
+    <button type="button" class="dialog__close" (click)="closed.emit()" aria-label="Close">
+      <img src="assets/icons/ic_close.svg" width="20" height="20" alt="" aria-hidden="true" />
+    </button>
+  </div>
 
   <form class="dialog__form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
     @for (field of fields(); track field.key) {
       <div class="field">
         <label class="field__label" [for]="'field-' + field.key">
-          {{ field.label }}{{ field.required ? '*' : '' }}
+          {{ field.label }}{{ field.required ? '*' : '' }}:
         </label>
         @switch (field.type) {
           @case ('textarea') {
@@ -14,6 +19,7 @@
               class="input"
               [id]="'field-' + field.key"
               [formControlName]="field.key"
+              [placeholder]="field.label"
             ></textarea>
           }
           @case ('select') {
@@ -23,20 +29,39 @@
               [id]="'field-' + field.key"
               [formControlName]="field.key"
             >
-              <option value="">Select…</option>
+              <option value="">Select {{ field.label.toLowerCase() }}</option>
               @for (option of field.options ?? []; track option.value) {
                 <option [value]="option.value">{{ option.label }}</option>
               }
             </select>
           }
           @default {
-            <input
-              class="input"
-              [class.input--invalid]="showError(field.key)"
-              [id]="'field-' + field.key"
-              [type]="field.type === 'url' ? 'url' : (field.type ?? 'text')"
-              [formControlName]="field.key"
-            />
+            <div class="input-clearable">
+              <input
+                class="input"
+                [class.input--invalid]="showError(field.key)"
+                [id]="'field-' + field.key"
+                [type]="field.type === 'url' ? 'url' : (field.type ?? 'text')"
+                [formControlName]="field.key"
+                [placeholder]="field.label"
+              />
+              @if (form.controls[field.key].value && field.type !== 'date') {
+                <button
+                  type="button"
+                  class="input-clearable__btn"
+                  (click)="clear(field.key)"
+                  [attr.aria-label]="'Clear ' + field.label"
+                >
+                  <img
+                    src="assets/icons/ic_clear.svg"
+                    width="16"
+                    height="16"
+                    alt=""
+                    aria-hidden="true"
+                  />
+                </button>
+              }
+            </div>
           }
         }
         @if (showError(field.key)) {
@@ -53,7 +78,7 @@
 
     <div class="dialog__actions">
       <button type="button" class="btn" (click)="closed.emit()">Cancel</button>
-      <button type="submit" class="btn btn--primary" [disabled]="isSaving()">
+      <button type="submit" class="btn btn--primary" [disabled]="isSaving() || form.invalid">
         {{ submitLabel() }}
       </button>
     </div>

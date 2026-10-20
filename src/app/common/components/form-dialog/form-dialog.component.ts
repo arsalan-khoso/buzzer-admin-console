@@ -57,6 +57,11 @@ export class FormDialogComponent implements OnInit {
     this.form = new FormGroup(controls);
   }
 
+  clear(key: string): void {
+    this.form.controls[key].setValue('');
+    this.form.controls[key].markAsTouched();
+  }
+
   showError(key: string): boolean {
     const control = this.form.controls[key];
     return control.invalid && (control.touched || this.submitted());
