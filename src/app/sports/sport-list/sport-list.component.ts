@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { catchError, debounceTime, map, of, skip, startWith, switchMap } from 'rxjs';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { BulkImportDialogComponent } from '../components/bulk-import-dialog/bulk-import-dialog.component';
 import { ConfirmDialogComponent } from '../../common/components/confirm-dialog/confirm-dialog.component';
 import { ICONS_PATH } from '../../common/constants/navigation.constants';
@@ -32,6 +32,7 @@ export class SportListComponent {
   private readonly sportsService = inject(SportsService);
   private readonly search = inject(LayoutService).searchQuery;
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
 
   readonly iconsPath = ICONS_PATH;
   readonly page = signal(1);
@@ -105,7 +106,7 @@ export class SportListComponent {
   }
 
   openSport(sport: Sport): void {
-    void this.router.navigate(['/sports', sport.id]);
+    void this.router.navigate([sport.id], { relativeTo: this.route });
   }
 
   markIconBroken(id: string): void {

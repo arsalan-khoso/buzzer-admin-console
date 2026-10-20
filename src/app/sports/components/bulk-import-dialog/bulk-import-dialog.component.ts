@@ -17,6 +17,7 @@ export class BulkImportDialogComponent {
   readonly progress = signal<ImportProgress | null>(null);
   readonly isImporting = signal(false);
   readonly errorMessage = signal('');
+  readonly fileName = signal('');
 
   async onFileSelected(event: Event): Promise<void> {
     const file = (event.target as HTMLInputElement).files?.[0];
@@ -25,6 +26,7 @@ export class BulkImportDialogComponent {
     }
     this.errorMessage.set('');
     this.progress.set(null);
+    this.fileName.set(file.name);
 
     let rows;
     try {
