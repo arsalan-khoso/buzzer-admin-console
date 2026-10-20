@@ -136,3 +136,11 @@
     cursor: pointer;
   }
 }
+
+// Social sign-in is shown as in the design but not wired up yet; keep the outlined look.
+.login__social:disabled {
+  border-color: var(--color-border-strong);
+  background-color: transparent;
+  color: var(--color-text);
+  cursor: not-allowed;
+}

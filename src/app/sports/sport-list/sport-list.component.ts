@@ -94,6 +94,8 @@ export class SportListComponent {
   readonly isDeleting = signal(false);
   readonly deleteError = signal('');
   readonly isImportOpen = signal(false);
+  /** Sports whose icon URL failed to load; they fall back to the accent dot. */
+  readonly brokenIcons = signal(new Set<string>());
 
   constructor() {
     // A new search always starts from the first page
@@ -104,6 +106,10 @@ export class SportListComponent {
 
   accent(index: number): string {
     return SPORT_ACCENTS[index % SPORT_ACCENTS.length];
+  }
+
+  markIconBroken(id: string): void {
+    this.brokenIcons.update((ids) => new Set(ids).add(id));
   }
 
   goToPage(page: number): void {
