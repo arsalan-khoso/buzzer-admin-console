@@ -1,294 +1,337 @@
 <section class="page">
-  <div class="page__toolbar">
-    <app-breadcrumb [items]="breadcrumb()" />
-  </div>
+  <app-breadcrumb [items]="breadcrumb()" />
 
   @if (organisation(); as organisation) {
-    <header class="detail-header">
-      <div class="detail-header__title">
-        <span class="avatar" aria-hidden="true">{{
-          organisation.name.charAt(0).toUpperCase()
-        }}</span>
-        <h2>{{ organisation.name }}</h2>
+    <header class="entity-card">
+      <div class="entity-card__head">
+        <h2 class="entity-card__name">
+          <span class="entity-card__logo" aria-hidden="true">{{
+            organisation.name.charAt(0).toUpperCase()
+          }}</span>
+          {{ organisation.name }}
+        </h2>
+        <span class="entity-card__actions">
+          <button
+            type="button"
+            class="icon-btn"
+            (click)="openEditOrganisation(organisation)"
+            [attr.aria-label]="'Edit ' + organisation.name"
+          >
+            <img
+              [src]="iconsPath + '/ic_edit.svg'"
+              width="18"
+              height="18"
+              alt=""
+              aria-hidden="true"
+            />
+          </button>
+          <button
+            type="button"
+            class="icon-btn"
+            (click)="askDeleteOrganisation(organisation)"
+            [attr.aria-label]="'Delete ' + organisation.name"
+          >
+            <img
+              [src]="iconsPath + '/ic_delete.svg'"
+              width="18"
+              height="18"
+              alt=""
+              aria-hidden="true"
+            />
+          </button>
+        </span>
       </div>
-      <dl class="detail-header__meta">
-        <dt>City</dt>
-        <dd>{{ organisation.city ?? '—' }}</dd>
-        <dt>Created</dt>
-        <dd>{{ organisation.createdAt | date: 'MMM d, y, HH:mm' }}</dd>
-        <dt>Updated</dt>
-        <dd>{{ organisation.updatedAt | date: 'MMM d, y, HH:mm' }}</dd>
+      <dl class="entity-card__meta">
+        <div>
+          <dt>Created:</dt>
+          <dd>{{ organisation.createdAt | date: "MMM d, y. 'at' HH:mm" }}</dd>
+        </div>
+        <div>
+          <dt>Updated:</dt>
+          <dd>{{ organisation.updatedAt | date: "MMM d, y. 'at' HH:mm" }}</dd>
+        </div>
+        <div>
+          <dt>City:</dt>
+          <dd>{{ organisation.city ?? '—' }}</dd>
+        </div>
       </dl>
     </header>
   } @else if (errorMessage()) {
     <p class="dialog__error" role="alert">{{ errorMessage() }}</p>
   }
 
-  <div class="tabs" role="tablist">
-    <button
-      type="button"
-      role="tab"
-      class="tabs__tab"
-      [class.tabs__tab--active]="activeTab() === 'participants'"
-      [attr.aria-selected]="activeTab() === 'participants'"
-      (click)="activeTab.set('participants')"
-    >
-      Participants
-    </button>
-    <button
-      type="button"
-      role="tab"
-      class="tabs__tab"
-      [class.tabs__tab--active]="activeTab() === 'squad'"
-      [attr.aria-selected]="activeTab() === 'squad'"
-      (click)="activeTab.set('squad')"
-    >
-      Squad
-    </button>
-    <button
-      type="button"
-      role="tab"
-      class="tabs__tab"
-      [class.tabs__tab--active]="activeTab() === 'staff'"
-      [attr.aria-selected]="activeTab() === 'staff'"
-      (click)="activeTab.set('staff')"
-    >
-      Staff
-    </button>
+  <div class="section-header">
+    <h3>Participants</h3>
+    @if (teams().length) {
+      <button type="button" class="btn btn--small" (click)="openAddParticipant()">
+        <img
+          [src]="iconsPath + '/ic_plus_circle.svg'"
+          width="16"
+          height="16"
+          alt=""
+          aria-hidden="true"
+        />
+        Add Participants
+      </button>
+    } @else if (!isLoading()) {
+      <button type="button" class="btn btn--small" (click)="openAddTeam()">
+        <img
+          [src]="iconsPath + '/ic_plus_circle.svg'"
+          width="16"
+          height="16"
+          alt=""
+          aria-hidden="true"
+        />
+        Add Team
+      </button>
+    }
+  </div>
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th scope="col">Participants</th>
+          <th scope="col" class="data-table__actions">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (participant of participants(); track participant.id) {
+          <tr
+            class="data-table__row--link"
+            tabindex="0"
+            (click)="openParticipant(participant)"
+            (keydown.enter)="openParticipant(participant)"
+          >
+            <td>{{ participant.firstName }} {{ participant.lastName }}</td>
+            <td
+              class="data-table__actions"
+              (click)="$event.stopPropagation()"
+              (keydown.enter)="$event.stopPropagation()"
+            >
+              <button
+                type="button"
+                class="icon-btn"
+                (click)="openEditParticipant(participant)"
+                [attr.aria-label]="'Edit ' + participant.firstName"
+              >
+                <img
+                  [src]="iconsPath + '/ic_edit.svg'"
+                  width="18"
+                  height="18"
+                  alt=""
+                  aria-hidden="true"
+                />
+              </button>
+              <button
+                type="button"
+                class="icon-btn"
+                (click)="askDeleteParticipant(participant)"
+                [attr.aria-label]="'Delete ' + participant.firstName"
+              >
+                <img
+                  [src]="iconsPath + '/ic_delete.svg'"
+                  width="18"
+                  height="18"
+                  alt=""
+                  aria-hidden="true"
+                />
+              </button>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td class="data-table__empty" colspan="2">
+              {{
+                isLoading()
+                  ? 'Loading…'
+                  : teams().length
+                    ? 'No participants yet.'
+                    : 'Add a team first, then add participants to it.'
+              }}
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
   </div>
 
-  @switch (activeTab()) {
-    @case ('participants') {
-      <div class="page__toolbar">
-        <h3>Participants</h3>
-        @if (teams().length) {
-          <button type="button" class="btn btn--small" (click)="openAddParticipant()">
-            Add Participant
-          </button>
-        } @else if (!isLoading()) {
-          <button type="button" class="btn btn--small" (click)="openAddTeam()">Add Team</button>
-        }
-      </div>
-      <div class="table-wrap">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th scope="col">Participant</th>
-              <th scope="col">Jersey</th>
-              <th scope="col">Position</th>
-              <th scope="col">Team</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (participant of participants(); track participant.id) {
-              <tr>
-                <td>
-                  <a class="data-table__link" [routerLink]="['participants', participant.id]">
-                    {{ participant.firstName }} {{ participant.lastName }}
-                  </a>
-                </td>
-                <td>{{ participant.jerseyNumber ?? '—' }}</td>
-                <td>{{ participant.position ?? '—' }}</td>
-                <td>{{ participant.team?.name ?? '—' }}</td>
-              </tr>
-            } @empty {
-              <tr>
-                <td class="data-table__empty" colspan="4">
-                  {{
-                    isLoading()
-                      ? 'Loading…'
-                      : teams().length
-                        ? 'No participants yet.'
-                        : 'Add a team first, then add participants to it.'
-                  }}
-                </td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      </div>
+  <div class="section-header">
+    <h3>Squad</h3>
+    @if (canManageMembers()) {
+      <button type="button" class="btn btn--small" (click)="openAddSquadMember()">
+        <img
+          [src]="iconsPath + '/ic_plus_circle.svg'"
+          width="16"
+          height="16"
+          alt=""
+          aria-hidden="true"
+        />
+        Add Squad Member
+      </button>
     }
-
-    @case ('squad') {
-      <div class="page__toolbar">
-        <h3>Squad</h3>
-        @if (canManageMembers()) {
-          <button type="button" class="btn btn--small" (click)="openAddSquadMember()">
-            Add Squad Member
-          </button>
-        }
-      </div>
-      <div class="table-wrap">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th scope="col">Photo</th>
-              <th scope="col">Name</th>
-              <th scope="col">Position</th>
-              <th scope="col">Age</th>
-              <th scope="col">Agreement end</th>
-              <th scope="col" class="data-table__actions">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (member of squad(); track member.id) {
-              <tr>
-                <td>
-                  @if (member.photoUrl) {
-                    <img
-                      class="member-photo"
-                      [src]="member.photoUrl"
-                      width="32"
-                      height="32"
-                      alt=""
-                    />
-                  } @else {
-                    <span class="avatar avatar--small" aria-hidden="true">{{
-                      member.displayName.charAt(0).toUpperCase()
-                    }}</span>
-                  }
-                </td>
-                <td>{{ member.displayName }}</td>
-                <td>{{ member.position }}</td>
-                <td>{{ member.age ?? '—' }}</td>
-                <td>{{ member.agreementEnd ? (member.agreementEnd | date: 'MMM d, y') : '—' }}</td>
-                <td class="data-table__actions">
-                  @if (canManageMembers()) {
-                    <button
-                      type="button"
-                      class="icon-btn"
-                      (click)="openEditSquadMember(member)"
-                      [attr.aria-label]="'Edit ' + member.displayName"
-                    >
-                      <img
-                        [src]="iconsPath + '/ic_edit.svg'"
-                        width="18"
-                        height="18"
-                        alt=""
-                        aria-hidden="true"
-                      />
-                    </button>
-                    <button
-                      type="button"
-                      class="icon-btn"
-                      (click)="askRemoveSquadMember(member)"
-                      [attr.aria-label]="'Remove ' + member.displayName"
-                    >
-                      <img
-                        [src]="iconsPath + '/ic_delete.svg'"
-                        width="18"
-                        height="18"
-                        alt=""
-                        aria-hidden="true"
-                      />
-                    </button>
-                  } @else {
-                    <span class="data-table__muted">View only</span>
-                  }
-                </td>
-              </tr>
-            } @empty {
-              <tr>
-                <td class="data-table__empty" colspan="6">
-                  {{ isLoading() ? 'Loading…' : 'No squad members yet.' }}
-                </td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      </div>
-    }
-
-    @case ('staff') {
-      <div class="page__toolbar">
-        <h3>Staff</h3>
-        @if (canManageMembers()) {
-          <button type="button" class="btn btn--small" (click)="openStaffDialog()">
-            Add Staff Member
-          </button>
-        }
-      </div>
-      @for (group of staffGroups(); track group.category) {
-        <h4 class="staff-group__title">{{ staffLabels[group.category] }}</h4>
-        <div class="table-wrap">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th scope="col">Photo</th>
-                <th scope="col">Name</th>
-                <th scope="col">Role</th>
-                <th scope="col">Nationality</th>
-                <th scope="col" class="data-table__actions">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (member of group.members; track member.id) {
-                <tr>
-                  <td>
-                    @if (member.photoUrl) {
-                      <img
-                        class="member-photo"
-                        [src]="member.photoUrl"
-                        width="32"
-                        height="32"
-                        alt=""
-                      />
-                    } @else {
-                      <span class="avatar avatar--small" aria-hidden="true">{{
-                        member.name.charAt(0).toUpperCase()
-                      }}</span>
-                    }
-                  </td>
-                  <td>{{ member.name }}</td>
-                  <td>{{ member.roleTitle }}</td>
-                  <td>{{ member.nationality ?? '—' }}</td>
-                  <td class="data-table__actions">
-                    @if (canManageMembers()) {
-                      <button
-                        type="button"
-                        class="icon-btn"
-                        (click)="openStaffDialog(member)"
-                        [attr.aria-label]="'Edit ' + member.name"
-                      >
-                        <img
-                          [src]="iconsPath + '/ic_edit.svg'"
-                          width="18"
-                          height="18"
-                          alt=""
-                          aria-hidden="true"
-                        />
-                      </button>
-                      <button
-                        type="button"
-                        class="icon-btn"
-                        (click)="askRemoveStaffMember(member)"
-                        [attr.aria-label]="'Remove ' + member.name"
-                      >
-                        <img
-                          [src]="iconsPath + '/ic_delete.svg'"
-                          width="18"
-                          height="18"
-                          alt=""
-                          aria-hidden="true"
-                        />
-                      </button>
-                    } @else {
-                      <span class="data-table__muted">View only</span>
-                    }
-                  </td>
-                </tr>
-              } @empty {
-                <tr>
-                  <td class="data-table__empty" colspan="5">No staff in this group.</td>
-                </tr>
+  </div>
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th scope="col">Photo</th>
+          <th scope="col">Name</th>
+          <th scope="col">Position</th>
+          <th scope="col">Age</th>
+          <th scope="col">Agreement end</th>
+          <th scope="col" class="data-table__actions">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (member of squad(); track member.id) {
+          <tr>
+            <td>
+              @if (member.photoUrl) {
+                <img class="member-photo" [src]="member.photoUrl" width="32" height="32" alt="" />
+              } @else {
+                <span class="avatar avatar--small" aria-hidden="true">{{
+                  member.displayName.charAt(0).toUpperCase()
+                }}</span>
               }
-            </tbody>
-          </table>
-        </div>
-      } @empty {
-        <p class="detail-header__text">{{ isLoading() ? 'Loading…' : 'No staff yet.' }}</p>
-      }
+            </td>
+            <td>{{ member.displayName }}</td>
+            <td>{{ member.position }}</td>
+            <td>{{ member.age ?? '—' }}</td>
+            <td>{{ member.agreementEnd ? (member.agreementEnd | date: 'MMM d, y') : '—' }}</td>
+            <td class="data-table__actions">
+              @if (canManageMembers()) {
+                <button
+                  type="button"
+                  class="icon-btn"
+                  (click)="openEditSquadMember(member)"
+                  [attr.aria-label]="'Edit ' + member.displayName"
+                >
+                  <img
+                    [src]="iconsPath + '/ic_edit.svg'"
+                    width="18"
+                    height="18"
+                    alt=""
+                    aria-hidden="true"
+                  />
+                </button>
+                <button
+                  type="button"
+                  class="icon-btn"
+                  (click)="askRemoveSquadMember(member)"
+                  [attr.aria-label]="'Remove ' + member.displayName"
+                >
+                  <img
+                    [src]="iconsPath + '/ic_delete.svg'"
+                    width="18"
+                    height="18"
+                    alt=""
+                    aria-hidden="true"
+                  />
+                </button>
+              } @else {
+                <span class="data-table__muted">View only</span>
+              }
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td class="data-table__empty" colspan="6">
+              {{ isLoading() ? 'Loading…' : 'No squad members yet.' }}
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section-header">
+    <h3>Staff</h3>
+    @if (canManageMembers()) {
+      <button type="button" class="btn btn--small" (click)="openStaffDialog()">
+        <img
+          [src]="iconsPath + '/ic_plus_circle.svg'"
+          width="16"
+          height="16"
+          alt=""
+          aria-hidden="true"
+        />
+        Add Staff Member
+      </button>
     }
+  </div>
+  @for (group of staffGroups(); track group.category) {
+    <h4 class="staff-group__title">{{ staffLabels[group.category] }}</h4>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th scope="col">Photo</th>
+            <th scope="col">Name</th>
+            <th scope="col">Role</th>
+            <th scope="col">Nationality</th>
+            <th scope="col" class="data-table__actions">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (member of group.members; track member.id) {
+            <tr>
+              <td>
+                @if (member.photoUrl) {
+                  <img class="member-photo" [src]="member.photoUrl" width="32" height="32" alt="" />
+                } @else {
+                  <span class="avatar avatar--small" aria-hidden="true">{{
+                    member.name.charAt(0).toUpperCase()
+                  }}</span>
+                }
+              </td>
+              <td>{{ member.name }}</td>
+              <td>{{ member.roleTitle }}</td>
+              <td>{{ member.nationality ?? '—' }}</td>
+              <td class="data-table__actions">
+                @if (canManageMembers()) {
+                  <button
+                    type="button"
+                    class="icon-btn"
+                    (click)="openStaffDialog(member)"
+                    [attr.aria-label]="'Edit ' + member.name"
+                  >
+                    <img
+                      [src]="iconsPath + '/ic_edit.svg'"
+                      width="18"
+                      height="18"
+                      alt=""
+                      aria-hidden="true"
+                    />
+                  </button>
+                  <button
+                    type="button"
+                    class="icon-btn"
+                    (click)="askRemoveStaffMember(member)"
+                    [attr.aria-label]="'Remove ' + member.name"
+                  >
+                    <img
+                      [src]="iconsPath + '/ic_delete.svg'"
+                      width="18"
+                      height="18"
+                      alt=""
+                      aria-hidden="true"
+                    />
+                  </button>
+                } @else {
+                  <span class="data-table__muted">View only</span>
+                }
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td class="data-table__empty" colspan="5">No staff in this group.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  } @empty {
+    <p class="detail-header__text">{{ isLoading() ? 'Loading…' : 'No staff yet.' }}</p>
   }
 </section>
 

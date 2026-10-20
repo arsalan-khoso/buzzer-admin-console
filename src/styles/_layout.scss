@@ -327,3 +327,87 @@
     font-weight: var(--font-weight-regular);
   }
 }
+
+// Header card of the governing body and organisation pages (Figma detail screens).
+.entity-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 260px;
+  gap: var(--space-3);
+
+  &__stats {
+    display: grid;
+    gap: var(--space-3);
+  }
+}
+
+.entity-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-lg);
+
+  &__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding-bottom: var(--space-4);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  &__name {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-semibold);
+  }
+
+  &__logo {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    border-radius: var(--radius-pill);
+    background-color: var(--color-white);
+    color: var(--color-dark);
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-bold);
+  }
+
+  &__actions {
+    display: inline-flex;
+    gap: var(--space-1);
+  }
+
+  &__meta {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-4);
+    margin: 0;
+    font-size: var(--font-size-sm);
+
+    dt {
+      margin-bottom: var(--space-1);
+      color: var(--color-text-muted);
+    }
+
+    dd {
+      margin: 0;
+    }
+  }
+}
+
+@media (max-width: 900px) {
+  .entity-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .entity-card__meta {
+    grid-template-columns: 1fr;
+  }
+}
