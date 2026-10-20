@@ -2,14 +2,16 @@ import { Routes } from '@angular/router';
 import { authGuard, guestGuard } from './core/auth/guards/auth.guard';
 import { NAV_GROUPS } from './common/constants/navigation.constants';
 
-const sectionRoutes: Routes = NAV_GROUPS.flatMap((group) => group.items).map((item) => ({
-  path: item.route.slice(1),
-  title: item.pageTitle ?? item.label,
-  loadComponent: () =>
-    import('./common/components/placeholder-page/placeholder-page.component').then(
-      (m) => m.PlaceholderPage,
-    ),
-}));
+const sectionRoutes: Routes = NAV_GROUPS.flatMap((group) => group.items)
+  .filter((item) => item.route !== '/sports')
+  .map((item) => ({
+    path: item.route.slice(1),
+    title: item.pageTitle ?? item.label,
+    loadComponent: () =>
+      import('./common/components/placeholder-page/placeholder-page.component').then(
+        (m) => m.PlaceholderPage,
+      ),
+  }));
 
 export const routes: Routes = [
   {
@@ -25,7 +27,14 @@ export const routes: Routes = [
       import('./common/components/main-layout/main-layout.component').then(
         (m) => m.MainLayoutComponent,
       ),
-    children: [{ path: '', redirectTo: 'dashboard', pathMatch: 'full' }, ...sectionRoutes],
+    children: [
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+      {
+        path: 'sports',
+        loadChildren: () => import('./sports/sports.routes').then((m) => m.SPORTS_ROUTES),
+      },
+      ...sectionRoutes,
+    ],
   },
   { path: '**', redirectTo: '' },
 ];

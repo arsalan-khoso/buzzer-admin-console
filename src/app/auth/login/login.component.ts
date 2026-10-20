@@ -27,6 +27,9 @@ export class LoginComponent {
   });
 
   readonly isSubmitting = signal(false);
+  readonly step = signal<'options' | 'email'>(
+    this.route.snapshot.queryParamMap.has('reason') ? 'email' : 'options',
+  );
   readonly isPasswordVisible = signal(false);
   readonly submitted = signal(false);
   readonly errorMessage = signal('');
