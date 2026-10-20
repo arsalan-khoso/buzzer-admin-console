@@ -3,20 +3,26 @@ import {
   ChangeDetectionStrategy,
   Component,
   OnInit,
+  computed,
   inject,
   input,
   output,
   signal,
 } from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs';
 import { httpErrorMessage } from '../../../common/utils/http-error.util';
+import { SPORT_ACCENTS } from '../../constants/sports.constants';
 import { Sport, toSportInput } from '../../models/sport.model';
 import { SportsService } from '../../services/sports.service';
 
 const URL_PATTERN = /^https?:\/\/\S+$/;
 
-/** Add/Edit Sport dialog laid out as the Figma "Add Sport" screen (fields from the task doc). */
+/**
+ * Add/Edit Sport dialog laid out as the Figma "Add Sport" screen: name, and an icon row whose
+ * square shows the icon on a palette colour (the API stores no colour, so it is not saved).
+ */
 @Component({
   selector: 'app-sport-dialog',
   imports: [ReactiveFormsModule],
@@ -34,24 +40,30 @@ export class SportDialogComponent implements OnInit {
   readonly form = inject(NonNullableFormBuilder).group({
     name: ['', Validators.required],
     iconUrl: ['', Validators.pattern(URL_PATTERN)],
-    description: [''],
   });
   readonly isSaving = signal(false);
   readonly errorMessage = signal('');
   readonly iconFailed = signal(false);
+  private readonly values = toSignal(this.form.valueChanges, { initialValue: this.form.value });
+
+  /** The icon square fills with a palette colour once a working icon URL is entered. */
+  readonly hasIcon = computed(
+    () => !!this.values().iconUrl && this.form.controls.iconUrl.valid && !this.iconFailed(),
+  );
+  readonly accent = computed(() => {
+    const name = this.values().name ?? '';
+    const hash = [...name].reduce((sum, char) => sum + char.charCodeAt(0), 0);
+    return SPORT_ACCENTS[hash % SPORT_ACCENTS.length];
+  });
 
   ngOnInit(): void {
     const sport = this.sport();
     if (sport) {
-      this.form.setValue({
-        name: sport.name,
-        iconUrl: sport.iconUrl ?? '',
-        description: sport.description ?? '',
-      });
+      this.form.setValue({ name: sport.name, iconUrl: sport.iconUrl ?? '' });
     }
   }
 
-  clear(control: 'name' | 'iconUrl' | 'description'): void {
+  clear(control: 'name' | 'iconUrl'): void {
     this.form.controls[control].setValue('');
   }
 

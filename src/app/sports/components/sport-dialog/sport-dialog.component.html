@@ -37,10 +37,15 @@
     </div>
 
     <div class="field">
-      <label class="field__label" for="sport-icon">Add Icon:</label>
+      <label class="field__label" for="sport-icon">Add Icon and color:</label>
       <div class="icon-input">
-        <label class="icon-input__preview" for="sport-icon" aria-hidden="true">
-          @if (form.controls.iconUrl.valid && form.controls.iconUrl.value && !iconFailed()) {
+        <label
+          class="icon-input__preview"
+          for="sport-icon"
+          aria-hidden="true"
+          [style.background-color]="hasIcon() ? accent() : null"
+        >
+          @if (hasIcon()) {
             <img
               [src]="form.controls.iconUrl.value"
               width="20"
@@ -82,28 +87,6 @@
       @if (showError('iconUrl')) {
         <p class="field__error">Enter a valid URL starting with http:// or https://.</p>
       }
-    </div>
-
-    <div class="field">
-      <label class="field__label" for="sport-description">Add Description:</label>
-      <div class="input-clearable">
-        <input
-          id="sport-description"
-          class="input"
-          formControlName="description"
-          placeholder="Description"
-        />
-        @if (form.controls.description.value) {
-          <button
-            type="button"
-            class="input-clearable__btn"
-            (click)="clear('description')"
-            aria-label="Clear description"
-          >
-            <img src="assets/icons/ic_clear.svg" width="16" height="16" alt="" aria-hidden="true" />
-          </button>
-        }
-      </div>
     </div>
 
     @if (errorMessage()) {
