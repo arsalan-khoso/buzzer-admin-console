@@ -47,8 +47,8 @@
           ></span>
         </div>
         <div class="import-report__tags">
-          <span class="tag tag--success">Added {{ progress.added }}</span>
-          <span class="tag tag--accent">Skipped {{ progress.skipped }}</span>
+          <span class="tag">Added {{ progress.added }}</span>
+          <span class="tag">Skipped {{ progress.skipped }}</span>
           @if (progress.failures.length) {
             <span class="tag tag--danger">Failed {{ progress.failures.length }}</span>
           }
