@@ -1,53 +1,70 @@
 <div class="dialog-backdrop"></div>
 <section class="dialog" role="dialog" aria-modal="true" aria-labelledby="import-title">
-  <h2 id="import-title" class="dialog__title">Import Sports</h2>
-  <p class="dialog__text">
-    Choose a CSV file with the columns name, description, iconUrl, or a JSON array of objects with
-    the same fields.
-  </p>
-
-  <div class="field">
-    <label class="field__label" for="import-file">File</label>
-    <input
-      id="import-file"
-      class="input"
-      type="file"
-      accept=".csv,.json"
-      [disabled]="isImporting()"
-      (change)="onFileSelected($event)"
-    />
+  <div class="dialog__header">
+    <h2 id="import-title" class="dialog__title">Import Sports</h2>
+    <button type="button" class="dialog__close" (click)="close()" aria-label="Close">
+      <img src="assets/icons/ic_close.svg" width="20" height="20" alt="" aria-hidden="true" />
+    </button>
   </div>
 
-  @if (errorMessage()) {
-    <p class="dialog__error" role="alert">{{ errorMessage() }}</p>
-  }
-
-  @if (progress(); as progress) {
-    <div class="import-report" role="status">
-      <p>
-        {{ isImporting() ? 'Importing' : 'Imported' }} {{ progress.processed }} of
-        {{ progress.total }} rows
-      </p>
-      <p>
-        <span class="tag tag--success">Added {{ progress.added }}</span>
-      </p>
-      <p>
-        <span class="tag tag--accent">Skipped (duplicates) {{ progress.skipped }}</span>
-      </p>
-      @if (progress.failures.length) {
-        <p>
-          <span class="tag tag--danger">Failed {{ progress.failures.length }}</span>
-        </p>
-        <ul class="import-report__failures">
-          @for (failure of progress.failures; track $index) {
-            <li>{{ failure.name }}: {{ failure.reason }}</li>
-          }
-        </ul>
-      }
+  <div class="dialog__form">
+    <div class="field">
+      <span class="field__label">Add file:</span>
+      <label class="file-drop" [class.file-drop--busy]="isImporting()">
+        <img
+          src="assets/icons/ic_plus_circle.svg"
+          width="24"
+          height="24"
+          alt=""
+          aria-hidden="true"
+        />
+        <span class="file-drop__title">{{ fileName() || 'Choose a CSV or JSON file' }}</span>
+        <span class="file-drop__hint">Columns: name, description, iconUrl</span>
+        <input
+          class="file-drop__input"
+          type="file"
+          accept=".csv,.json"
+          [disabled]="isImporting()"
+          (change)="onFileSelected($event)"
+        />
+      </label>
     </div>
-  }
 
-  <div class="dialog__actions">
-    <button type="button" class="btn" [disabled]="isImporting()" (click)="close()">Close</button>
+    @if (errorMessage()) {
+      <p class="dialog__error" role="alert">{{ errorMessage() }}</p>
+    }
+
+    @if (progress(); as progress) {
+      <div class="import-report" role="status">
+        <p class="import-report__count">
+          {{ isImporting() ? 'Importing' : 'Imported' }} {{ progress.processed }} of
+          {{ progress.total }} rows
+        </p>
+        <div class="import-report__bar">
+          <span
+            class="import-report__fill"
+            [style.width.%]="(progress.processed / progress.total) * 100"
+          ></span>
+        </div>
+        <div class="import-report__tags">
+          <span class="tag tag--success">Added {{ progress.added }}</span>
+          <span class="tag tag--accent">Skipped {{ progress.skipped }}</span>
+          @if (progress.failures.length) {
+            <span class="tag tag--danger">Failed {{ progress.failures.length }}</span>
+          }
+        </div>
+        @if (progress.failures.length) {
+          <ul class="import-report__failures">
+            @for (failure of progress.failures; track $index) {
+              <li>{{ failure.name }}: {{ failure.reason }}</li>
+            }
+          </ul>
+        }
+      </div>
+    }
+
+    <div class="dialog__actions">
+      <button type="button" class="btn" [disabled]="isImporting()" (click)="close()">Close</button>
+    </div>
   </div>
 </section>
