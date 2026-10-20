@@ -113,3 +113,31 @@
     color: var(--color-danger);
   }
 }
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+
+  &__label {
+    color: var(--color-text-muted);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-medium);
+  }
+
+  &__error {
+    color: var(--color-danger);
+    font-size: var(--font-size-xs);
+  }
+}
+
+textarea.input {
+  height: auto;
+  min-height: 88px;
+  padding: var(--space-2) var(--space-3);
+  resize: vertical;
+}
+
+select.input {
+  appearance: auto;
+}

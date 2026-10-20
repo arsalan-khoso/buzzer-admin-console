@@ -1,10 +1,9 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { LOGIN_ROUTE } from '../../auth/constants/auth.constants';
+import { AuthService } from '../../core/auth/services/auth.service';
 import { ICONS_PATH, NAV_GROUPS } from '../constants/navigation.constants';
 import { LayoutService } from '../services/layout.service';
-
-// Shown until the auth task wires GET /api/auth/me into the footer.
-const PLACEHOLDER_USER_EMAIL = 'admin@buzzer.dev';
 
 @Component({
   selector: 'app-sidebar',
@@ -16,12 +15,15 @@ const PLACEHOLDER_USER_EMAIL = 'admin@buzzer.dev';
 export class SidebarComponent {
   readonly navGroups = NAV_GROUPS;
   readonly iconsPath = ICONS_PATH;
-  readonly userEmail = PLACEHOLDER_USER_EMAIL;
-  readonly userInitial = PLACEHOLDER_USER_EMAIL.charAt(0).toUpperCase();
 
   private readonly layout = inject(LayoutService);
+  private readonly auth = inject(AuthService);
+  private readonly router = inject(Router);
+
   readonly isCollapsed = this.layout.isSidebarCollapsed;
   readonly collapsedGroups = signal(new Set<string>());
+  readonly userEmail = computed(() => this.auth.currentUser()?.email ?? '');
+  readonly userInitial = computed(() => this.userEmail().charAt(0).toUpperCase());
 
   toggle(): void {
     this.layout.toggleSidebar();
@@ -39,5 +41,10 @@ export class SidebarComponent {
 
   isGroupOpen(label: string): boolean {
     return this.isCollapsed() || !this.collapsedGroups().has(label);
+  }
+
+  signOut(): void {
+    this.auth.logout();
+    void this.router.navigate([LOGIN_ROUTE]);
   }
 }

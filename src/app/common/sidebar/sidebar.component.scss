@@ -218,10 +218,5 @@
     font-size: 11px;
     text-decoration: underline;
     cursor: pointer;
-
-    &:disabled {
-      cursor: default;
-      opacity: 0.8;
-    }
   }
 }

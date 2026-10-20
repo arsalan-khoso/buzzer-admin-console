@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { authGuard, guestGuard } from './core/auth/guards/auth.guard';
 import { NAV_GROUPS } from './common/constants/navigation.constants';
 
 const sectionRoutes: Routes = NAV_GROUPS.flatMap((group) => group.items).map((item) => ({
@@ -12,7 +13,14 @@ const sectionRoutes: Routes = NAV_GROUPS.flatMap((group) => group.items).map((it
 
 export const routes: Routes = [
   {
+    path: 'login',
+    title: 'Sign in',
+    canActivate: [guestGuard],
+    loadComponent: () => import('./auth/login/login.component').then((m) => m.LoginComponent),
+  },
+  {
     path: '',
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./common/components/main-layout/main-layout.component').then(
         (m) => m.MainLayoutComponent,

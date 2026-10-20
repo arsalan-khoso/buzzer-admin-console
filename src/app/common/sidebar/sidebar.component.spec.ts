@@ -1,3 +1,4 @@
+import { provideHttpClient } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { NAV_GROUPS } from '../constants/navigation.constants';
@@ -8,7 +9,7 @@ describe('SidebarComponent', () => {
     localStorage.clear();
     await TestBed.configureTestingModule({
       imports: [SidebarComponent],
-      providers: [provideRouter([])],
+      providers: [provideRouter([]), provideHttpClient()],
     }).compileComponents();
   });
 
