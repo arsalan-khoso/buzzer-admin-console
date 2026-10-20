@@ -154,16 +154,7 @@
 </section>
 
 @if (isFormOpen()) {
-  <app-form-dialog
-    [title]="editingSport() ? 'Edit Sport' : 'Add Sport'"
-    [submitLabel]="'Save'"
-    [fields]="sportFields"
-    [initialValue]="sportFormValue()"
-    [save]="saveSport"
-    conflictMessage="A sport with this name already exists."
-    (saved)="onSaved()"
-    (closed)="closeForm()"
-  />
+  <app-sport-dialog [sport]="editingSport()" (saved)="onSaved()" (closed)="closeForm()" />
 }
 
 @if (deletingSport(); as sport) {

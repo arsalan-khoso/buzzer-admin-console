@@ -175,3 +175,12 @@
     (cancelled)="pendingDelete.set(null)"
   />
 }
+
+@if (competitionDialog(); as config) {
+  <app-competition-dialog
+    [organisation]="config.organisation"
+    [governingBodyId]="governingBodyId()"
+    (saved)="onSaved()"
+    (closed)="competitionDialog.set(null)"
+  />
+}
