@@ -37,13 +37,15 @@
     </div>
 
     <div class="field">
-      <label class="field__label" for="sport-icon">Add Icon:</label>
+      <label class="field__label" for="sport-colour">Add Icon and color:</label>
       <div class="icon-input">
-        <label
+        <button
+          type="button"
           class="icon-input__preview"
-          for="sport-icon"
-          aria-hidden="true"
-          [style.background-color]="accent()"
+          [style.background-color]="swatch()"
+          (click)="toggleIconField()"
+          [attr.aria-expanded]="isIconFieldOpen()"
+          aria-label="Add icon"
         >
           @if (showsIcon()) {
             <img
@@ -53,15 +55,49 @@
               alt=""
               (error)="iconFailed.set(true)"
             />
+          } @else if (!swatch()) {
+            <img src="assets/icons/ic_plus.svg" width="16" height="16" alt="" aria-hidden="true" />
           }
-        </label>
+        </button>
         <div class="input-clearable">
           <input
-            id="sport-icon"
+            id="sport-colour"
+            class="input"
+            [class.input--invalid]="showError('colour')"
+            formControlName="colour"
+            placeholder="#FFFFFF"
+            maxlength="7"
+          />
+          @if (form.controls.colour.value) {
+            <button
+              type="button"
+              class="input-clearable__btn"
+              (click)="clear('colour')"
+              aria-label="Clear colour"
+            >
+              <img
+                src="assets/icons/ic_clear.svg"
+                width="16"
+                height="16"
+                alt=""
+                aria-hidden="true"
+              />
+            </button>
+          }
+        </div>
+      </div>
+      @if (showError('colour')) {
+        <p class="field__error">Enter a hex colour like #2ED368.</p>
+      }
+
+      @if (isIconFieldOpen()) {
+        <div class="input-clearable">
+          <input
             class="input"
             [class.input--invalid]="showError('iconUrl')"
             formControlName="iconUrl"
             placeholder="Icon URL"
+            aria-label="Icon URL"
             (input)="iconFailed.set(false)"
           />
           @if (form.controls.iconUrl.value) {
@@ -81,32 +117,10 @@
             </button>
           }
         </div>
-      </div>
-      @if (showError('iconUrl')) {
-        <p class="field__error">Enter a valid URL starting with http:// or https://.</p>
-      }
-    </div>
-
-    <div class="field">
-      <label class="field__label" for="sport-description">Add Description:</label>
-      <div class="input-clearable">
-        <input
-          id="sport-description"
-          class="input"
-          formControlName="description"
-          placeholder="Description"
-        />
-        @if (form.controls.description.value) {
-          <button
-            type="button"
-            class="input-clearable__btn"
-            (click)="clear('description')"
-            aria-label="Clear description"
-          >
-            <img src="assets/icons/ic_clear.svg" width="16" height="16" alt="" aria-hidden="true" />
-          </button>
+        @if (showError('iconUrl')) {
+          <p class="field__error">Enter a valid URL starting with http:// or https://.</p>
         }
-      </div>
+      }
     </div>
 
     @if (errorMessage()) {
