@@ -16,8 +16,8 @@
   @if (sport(); as sport) {
     <header class="detail-header">
       <div class="detail-header__title">
-        @if (sport.iconUrl) {
-          <img [src]="sport.iconUrl" width="24" height="24" alt="" />
+        @if (sport.iconUrl && !iconFailed()) {
+          <img [src]="sport.iconUrl" width="24" height="24" alt="" (error)="iconFailed.set(true)" />
         }
         <h2>{{ sport.name }}</h2>
       </div>

@@ -59,10 +59,11 @@
                 aria-hidden="true"
               />
               <span class="sport-list__name">
-                @if (sport.iconUrl) {
+                @if (sport.iconUrl && !brokenIcons().has(sport.id)) {
                   <img
                     class="sport-list__icon"
                     [src]="sport.iconUrl"
+                    (error)="markIconBroken(sport.id)"
                     width="20"
                     height="20"
                     alt=""

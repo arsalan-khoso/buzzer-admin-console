@@ -77,6 +77,7 @@ export class SportDetailComponent {
   ]);
 
   readonly isAddOpen = signal(false);
+  readonly iconFailed = signal(false);
   readonly addGoverningBody = (value: FormDialogValue) =>
     this.hierarchy.createGoverningBody({
       name: value['name'],
