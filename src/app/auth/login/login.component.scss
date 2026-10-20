@@ -1,0 +1,138 @@
+.login {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: var(--space-6) var(--space-4);
+  background-color: var(--color-surface);
+
+  &__card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    width: 100%;
+    max-width: 420px;
+    padding: var(--space-6) var(--space-4) var(--space-4);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background-color: var(--color-surface);
+  }
+
+  &__back {
+    position: absolute;
+    top: var(--space-4);
+    left: var(--space-4);
+    display: inline-flex;
+    padding: 0;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  &__brand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-1);
+    margin-bottom: var(--space-2);
+
+    img {
+      border-radius: var(--radius-sm);
+    }
+  }
+
+  &__brand-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1;
+  }
+
+  &__brand-name {
+    font-size: var(--font-size-xl);
+    font-style: italic;
+    font-weight: var(--font-weight-bold);
+  }
+
+  &__brand-tagline {
+    color: var(--color-accent);
+    font-size: 11px;
+    font-style: italic;
+    font-weight: var(--font-weight-semibold);
+  }
+
+  &__notice {
+    padding: var(--space-3);
+    border-radius: var(--radius-md);
+    background-color: rgba(255, 180, 20, 0.12);
+    color: var(--color-accent);
+    font-size: var(--font-size-sm);
+
+    &--error {
+      background-color: rgba(236, 25, 60, 0.12);
+      color: var(--color-danger);
+    }
+  }
+
+  &__options,
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  &__full {
+    width: 100%;
+  }
+
+  &__password {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid transparent;
+    border-radius: var(--radius-md);
+    background-color: var(--color-surface-2);
+
+    &:focus-within {
+      border-color: var(--color-accent);
+    }
+
+    &--invalid {
+      border-color: var(--color-danger);
+    }
+  }
+
+  &__password-input {
+    height: 28px;
+    padding: 0 32px 0 0;
+    border: none;
+    background: transparent;
+    font-size: var(--font-size-sm);
+
+    &::placeholder {
+      color: var(--color-text-subtle);
+    }
+
+    &:focus {
+      outline: none;
+    }
+  }
+
+  &__hint {
+    color: var(--color-text-subtle);
+    font-size: 10px;
+  }
+
+  &__toggle {
+    position: absolute;
+    top: var(--space-3);
+    right: var(--space-3);
+    display: inline-flex;
+    padding: 0;
+    border: none;
+    background: transparent;
+    opacity: 0.7;
+    cursor: pointer;
+  }
+}

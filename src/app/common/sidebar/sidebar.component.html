@@ -89,13 +89,11 @@
   </nav>
 
   <div class="sidebar__user">
-    <span class="sidebar__avatar" aria-hidden="true">{{ userInitial }}</span>
+    <span class="sidebar__avatar" aria-hidden="true">{{ userInitial() }}</span>
     @if (!isCollapsed()) {
       <div class="sidebar__user-info">
-        <span class="sidebar__user-email">{{ userEmail }}</span>
-        <button type="button" class="sidebar__sign-out" disabled title="Available after login">
-          Sign out
-        </button>
+        <span class="sidebar__user-email">{{ userEmail() }}</span>
+        <button type="button" class="sidebar__sign-out" (click)="signOut()">Sign out</button>
       </div>
     }
   </div>

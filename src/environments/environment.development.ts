@@ -1,5 +1,5 @@
 // Local development settings, swapped in by `ng serve` via fileReplacements.
 export const environment = {
   production: false,
-  apiBaseUrl: 'https://YOUR-BUZZER-BACKEND-URL/api',
+  apiBaseUrl: 'https://backend-3ofw.onrender.com/api',
 };
