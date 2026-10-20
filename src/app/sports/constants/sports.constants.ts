@@ -19,3 +19,6 @@ export const STAFF_CATEGORY_LABELS: Record<string, string> = {
 
 /** Delay between import requests keeps a large file under the 300 requests/minute limit. */
 export const IMPORT_REQUEST_DELAY_MS = 220;
+
+/** Squad and staff writes need an ADMIN or ORG token; OPERATOR and VIEWER get 403. */
+export const MEMBER_WRITE_ROLES: readonly string[] = ['ADMIN', 'ORG'];

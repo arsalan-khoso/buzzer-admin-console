@@ -301,3 +301,8 @@
     color: var(--color-danger);
   }
 }
+
+.data-table__muted {
+  color: var(--color-text-subtle);
+  font-size: var(--font-size-xs);
+}
