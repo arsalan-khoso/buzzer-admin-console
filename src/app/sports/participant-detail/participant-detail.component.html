@@ -1,0 +1,32 @@
+<section class="page">
+  <div class="page__toolbar">
+    <app-breadcrumb [items]="breadcrumb()" />
+  </div>
+
+  @if (participant(); as participant) {
+    <header class="detail-header">
+      <div class="detail-header__title">
+        <span class="avatar" aria-hidden="true">{{
+          participant.firstName.charAt(0).toUpperCase()
+        }}</span>
+        <h2>{{ participant.firstName }} {{ participant.lastName }}</h2>
+      </div>
+      <dl class="detail-header__meta">
+        <dt>Jersey number</dt>
+        <dd>{{ participant.jerseyNumber ?? '—' }}</dd>
+        <dt>Position</dt>
+        <dd>{{ participant.position ?? '—' }}</dd>
+        <dt>Team</dt>
+        <dd>{{ participant.team?.name ?? '—' }}</dd>
+        <dt>Created</dt>
+        <dd>{{ participant.createdAt | date: 'MMM d, y, HH:mm' }}</dd>
+        <dt>Updated</dt>
+        <dd>{{ participant.updatedAt | date: 'MMM d, y, HH:mm' }}</dd>
+      </dl>
+    </header>
+  } @else if (errorMessage()) {
+    <p class="dialog__error" role="alert">{{ errorMessage() }}</p>
+  } @else {
+    <p class="detail-header__text">Loading…</p>
+  }
+</section>
