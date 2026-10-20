@@ -48,7 +48,12 @@
       </thead>
       <tbody>
         @for (sport of sports(); track sport.id; let i = $index) {
-          <tr>
+          <tr
+            class="data-table__row--link"
+            tabindex="0"
+            (click)="openSport(sport)"
+            (keydown.enter)="openSport(sport)"
+          >
             <td>
               <img
                 class="data-table__grip"
@@ -73,13 +78,17 @@
                     {{ sport.name.charAt(0).toUpperCase() }}
                   </span>
                 }
-                <a class="data-table__link" [routerLink]="[sport.id]">{{ sport.name }}</a>
+                {{ sport.name }}
               </span>
             </td>
             <td>{{ sport.governingBodyCount ?? 0 }}</td>
             <td>{{ sport.organizationCount ?? 0 }}</td>
             <td>{{ sport.participantCount ?? 0 }}</td>
-            <td class="data-table__actions">
+            <td
+              class="data-table__actions"
+              (click)="$event.stopPropagation()"
+              (keydown.enter)="$event.stopPropagation()"
+            >
               <button
                 type="button"
                 class="icon-btn"

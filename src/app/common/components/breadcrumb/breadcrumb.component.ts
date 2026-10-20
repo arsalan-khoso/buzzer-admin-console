@@ -14,27 +14,38 @@ export interface BreadcrumbItem {
     <nav class="breadcrumb" aria-label="Breadcrumb">
       @for (item of items(); track $index; let last = $last) {
         @if (item.link && !last) {
-          <a class="chip breadcrumb__link" [routerLink]="item.link">{{ item.label }}</a>
+          <a class="breadcrumb__item" [routerLink]="item.link">{{ item.label }}</a>
         } @else {
-          <span class="chip breadcrumb__current" aria-current="page">{{ item.label }}</span>
+          <span class="breadcrumb__item breadcrumb__item--current" aria-current="page">
+            {{ item.label }}
+          </span>
         }
       }
     </nav>
   `,
+  // Segmented look from the Figma breadcrumb: joined chips, the current page highlighted
   styles: `
     .breadcrumb {
-      display: flex;
+      display: inline-flex;
       flex-wrap: wrap;
-      gap: var(--space-1);
+      align-self: flex-start;
+      overflow: hidden;
+      border-radius: var(--radius-md);
+      background-color: var(--color-surface-3);
     }
 
-    .breadcrumb__link {
-      background-color: transparent;
-      color: var(--color-text-muted);
+    .breadcrumb__item {
+      padding: var(--space-1) var(--space-3);
+      font-size: var(--font-size-xs);
+      line-height: 20px;
 
-      &:hover {
-        color: var(--color-text);
+      &:hover:not(.breadcrumb__item--current) {
+        background-color: var(--color-gray);
       }
+    }
+
+    .breadcrumb__item--current {
+      background-color: var(--color-gray);
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,

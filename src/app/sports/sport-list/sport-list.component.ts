@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { catchError, debounceTime, map, of, skip, startWith, switchMap } from 'rxjs';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { BulkImportDialogComponent } from '../components/bulk-import-dialog/bulk-import-dialog.component';
 import { ConfirmDialogComponent } from '../../common/components/confirm-dialog/confirm-dialog.component';
 import { ICONS_PATH } from '../../common/constants/navigation.constants';
@@ -23,12 +23,7 @@ const LOADING_STATE: ListState = { sports: [], totalPages: 1, isLoading: true, e
 
 @Component({
   selector: 'app-sport-list',
-  imports: [
-    RouterLink,
-    SportFormDialogComponent,
-    ConfirmDialogComponent,
-    BulkImportDialogComponent,
-  ],
+  imports: [SportFormDialogComponent, ConfirmDialogComponent, BulkImportDialogComponent],
   templateUrl: './sport-list.component.html',
   styleUrl: './sport-list.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -36,6 +31,8 @@ const LOADING_STATE: ListState = { sports: [], totalPages: 1, isLoading: true, e
 export class SportListComponent {
   private readonly sportsService = inject(SportsService);
   private readonly search = inject(LayoutService).searchQuery;
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
 
   readonly iconsPath = ICONS_PATH;
   readonly page = signal(1);
@@ -106,6 +103,10 @@ export class SportListComponent {
 
   accent(index: number): string {
     return SPORT_ACCENTS[index % SPORT_ACCENTS.length];
+  }
+
+  openSport(sport: Sport): void {
+    void this.router.navigate([sport.id], { relativeTo: this.route });
   }
 
   markIconBroken(id: string): void {

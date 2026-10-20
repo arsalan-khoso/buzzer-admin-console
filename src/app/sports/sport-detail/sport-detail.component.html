@@ -1,36 +1,88 @@
 <section class="page">
-  <div class="page__toolbar">
-    <app-breadcrumb [items]="breadcrumb()" />
-    <button type="button" class="btn btn--small" (click)="isAddOpen.set(true)">
-      <img
-        [src]="iconsPath + '/ic_plus_circle.svg'"
-        width="16"
-        height="16"
-        alt=""
-        aria-hidden="true"
-      />
-      Add Governing Body
-    </button>
-  </div>
+  <app-breadcrumb [items]="breadcrumb()" />
 
   @if (sport(); as sport) {
-    <header class="detail-header">
-      <div class="detail-header__title">
-        @if (sport.iconUrl && !iconFailed()) {
-          <img [src]="sport.iconUrl" width="24" height="24" alt="" (error)="iconFailed.set(true)" />
-        }
-        <h2>{{ sport.name }}</h2>
+    <header class="sport-card">
+      <div class="sport-card__head">
+        <h2 class="sport-card__name">
+          @if (sport.iconUrl && !iconFailed()) {
+            <img
+              class="sport-card__icon"
+              [src]="sport.iconUrl"
+              width="24"
+              height="24"
+              alt=""
+              (error)="iconFailed.set(true)"
+            />
+          } @else {
+            <span class="sport-card__dot" [style.background-color]="accent()">
+              {{ sport.name.charAt(0).toUpperCase() }}
+            </span>
+          }
+          {{ sport.name }}
+        </h2>
+        <span class="sport-card__actions">
+          <button
+            type="button"
+            class="icon-btn"
+            (click)="isSportFormOpen.set(true)"
+            [attr.aria-label]="'Edit ' + sport.name"
+          >
+            <img
+              [src]="iconsPath + '/ic_edit.svg'"
+              width="18"
+              height="18"
+              alt=""
+              aria-hidden="true"
+            />
+          </button>
+          <button
+            type="button"
+            class="icon-btn"
+            (click)="askDeleteSport(sport)"
+            [attr.aria-label]="'Delete ' + sport.name"
+          >
+            <img
+              [src]="iconsPath + '/ic_delete.svg'"
+              width="18"
+              height="18"
+              alt=""
+              aria-hidden="true"
+            />
+          </button>
+        </span>
       </div>
-      @if (sport.description) {
-        <p class="detail-header__text">{{ sport.description }}</p>
-      }
-      <dl class="detail-header__meta">
-        <dt>Created</dt>
-        <dd>{{ sport.createdAt | date: 'MMM d, y, HH:mm' }}</dd>
-        <dt>Updated</dt>
-        <dd>{{ sport.updatedAt | date: 'MMM d, y, HH:mm' }}</dd>
+
+      <dl class="sport-card__meta">
+        <div class="sport-card__row">
+          <dt>Created:</dt>
+          <dd>{{ sport.createdAt | date: "MMM d, y. 'at' HH:mm" }}</dd>
+        </div>
+        <div class="sport-card__row">
+          <dt>Icon:</dt>
+          <dd>
+            @if (sport.iconUrl && !iconFailed()) {
+              <img [src]="sport.iconUrl" width="16" height="16" alt="" />
+            } @else {
+              —
+            }
+          </dd>
+        </div>
+        <div class="sport-card__row">
+          <dt>Updated:</dt>
+          <dd>{{ sport.updatedAt | date: "MMM d, y. 'at' HH:mm" }}</dd>
+        </div>
+        <div class="sport-card__row">
+          <dt>Color:</dt>
+          <dd class="sport-card__color">
+            <span class="sport-card__swatch" [style.background-color]="accent()"></span>
+            {{ accent() }}
+          </dd>
+        </div>
       </dl>
     </header>
+  } @else if (errorMessage()) {
+    <p class="dialog__error" role="alert">{{ errorMessage() }}</p>
   }
 
   <div class="stat-grid">
@@ -48,28 +100,75 @@
     </div>
   </div>
 
-  <h3>Governing Bodies</h3>
+  <div class="section-header">
+    <h3>Governing Bodies</h3>
+    <button type="button" class="btn btn--small" (click)="openAddGoverningBody()">
+      <img
+        [src]="iconsPath + '/ic_plus_circle.svg'"
+        width="16"
+        height="16"
+        alt=""
+        aria-hidden="true"
+      />
+      Add Governing Body
+    </button>
+  </div>
+
   <div class="table-wrap">
     <table class="data-table">
       <thead>
         <tr>
-          <th scope="col">Governing Body</th>
-          <th scope="col">Country</th>
+          <th scope="col">Governing Bodies</th>
           <th scope="col">Organisations</th>
           <th scope="col">Participants</th>
+          <th scope="col" class="data-table__actions">Actions</th>
         </tr>
       </thead>
       <tbody>
         @for (body of governingBodies(); track body.id) {
-          <tr>
-            <td>
-              <a class="data-table__link" [routerLink]="['governing-bodies', body.id]">
-                {{ body.name }}
-              </a>
-            </td>
-            <td>{{ body.country ?? '—' }}</td>
+          <tr
+            class="data-table__row--link"
+            tabindex="0"
+            (click)="openGoverningBody(body)"
+            (keydown.enter)="openGoverningBody(body)"
+          >
+            <td>{{ body.name }}</td>
             <td>{{ body.organizationCount ?? 0 }}</td>
             <td>{{ body.participantCount ?? 0 }}</td>
+            <td
+              class="data-table__actions"
+              (click)="$event.stopPropagation()"
+              (keydown.enter)="$event.stopPropagation()"
+            >
+              <button
+                type="button"
+                class="icon-btn"
+                (click)="openEditGoverningBody(body)"
+                [attr.aria-label]="'Edit ' + body.name"
+              >
+                <img
+                  [src]="iconsPath + '/ic_edit.svg'"
+                  width="18"
+                  height="18"
+                  alt=""
+                  aria-hidden="true"
+                />
+              </button>
+              <button
+                type="button"
+                class="icon-btn"
+                (click)="askDeleteGoverningBody(body)"
+                [attr.aria-label]="'Delete ' + body.name"
+              >
+                <img
+                  [src]="iconsPath + '/ic_delete.svg'"
+                  width="18"
+                  height="18"
+                  alt=""
+                  aria-hidden="true"
+                />
+              </button>
+            </td>
           </tr>
         } @empty {
           <tr>
@@ -83,13 +182,33 @@
   </div>
 </section>
 
-@if (isAddOpen()) {
+@if (isSportFormOpen()) {
+  <app-sport-form-dialog
+    [sport]="sport()"
+    (saved)="onSaved()"
+    (closed)="isSportFormOpen.set(false)"
+  />
+}
+
+@if (governingBodyDialog(); as config) {
   <app-form-dialog
-    title="Add Governing Body"
-    submitLabel="Add"
+    [title]="config.title"
+    [submitLabel]="config.submitLabel"
     [fields]="governingBodyFields"
-    [save]="addGoverningBody"
-    (saved)="onAdded()"
-    (closed)="isAddOpen.set(false)"
+    [initialValue]="config.initialValue"
+    [save]="config.save"
+    (saved)="onSaved()"
+    (closed)="governingBodyDialog.set(null)"
+  />
+}
+
+@if (pendingDelete(); as pending) {
+  <app-confirm-dialog
+    [title]="pending.title"
+    [message]="pending.message"
+    [isBusy]="isDeleting()"
+    [errorMessage]="deleteError()"
+    (confirmed)="confirmDelete()"
+    (cancelled)="pendingDelete.set(null)"
   />
 }
