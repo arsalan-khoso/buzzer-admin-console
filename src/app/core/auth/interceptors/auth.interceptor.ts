@@ -33,8 +33,10 @@ export const authInterceptor: HttpInterceptorFn = (request, next) => {
   const send = (token: string | null) => next(withToken(request, token));
   const sessionExpired = (error: unknown): Observable<never> => {
     auth.clearSession();
+    // During the first navigation router.url is still "/", so prefer the page being opened
+    const returnUrl = router.currentNavigation()?.finalUrl?.toString() ?? router.url;
     void router.navigate([LOGIN_ROUTE], {
-      queryParams: { returnUrl: router.url, reason: SESSION_EXPIRED_PARAM },
+      queryParams: { returnUrl, reason: SESSION_EXPIRED_PARAM },
     });
     return throwError(() => error);
   };
