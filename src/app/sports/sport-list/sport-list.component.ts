@@ -9,6 +9,7 @@ import { LayoutService } from '../../common/services/layout.service';
 import { httpErrorMessage } from '../../common/utils/http-error.util';
 import { SportDialogComponent } from '../components/sport-dialog/sport-dialog.component';
 import { SPORT_ACCENTS, SPORTS_PAGE_SIZE } from '../constants/sports.constants';
+import { SortOrder } from '../../core/models/api.model';
 import { CatalogueTotals, Sport } from '../models/sport.model';
 import { SportsService } from '../services/sports.service';
 
@@ -36,6 +37,8 @@ export class SportListComponent {
 
   readonly iconsPath = ICONS_PATH;
   readonly page = signal(1);
+  /** Only the name column is sortable: the API returns 500 for the count fields. */
+  readonly sortOrder = signal<SortOrder>('asc');
   private readonly reloadKey = signal(0);
 
   /** Search runs on the server (?search=), so the table only ever shows one page from the API. */
@@ -44,28 +47,31 @@ export class SportListComponent {
       computed(() => ({
         search: this.search().trim(),
         page: this.page(),
+        sortOrder: this.sortOrder(),
         reload: this.reloadKey(),
       })),
     ).pipe(
       debounceTime(300),
-      switchMap(({ search, page }) =>
-        this.sportsService.list({ search, page, limit: SPORTS_PAGE_SIZE }).pipe(
-          map((result): ListState => ({
-            sports: result.items,
-            totalPages: Math.max(result.meta.totalPages, 1),
-            isLoading: false,
-            error: '',
-          })),
-          catchError((error: unknown) =>
-            of<ListState>({
-              sports: [],
-              totalPages: 1,
+      switchMap(({ search, page, sortOrder }) =>
+        this.sportsService
+          .list({ search, page, sortBy: 'name', sortOrder, limit: SPORTS_PAGE_SIZE })
+          .pipe(
+            map((result): ListState => ({
+              sports: result.items,
+              totalPages: Math.max(result.meta.totalPages, 1),
               isLoading: false,
-              error: httpErrorMessage(error),
-            }),
+              error: '',
+            })),
+            catchError((error: unknown) =>
+              of<ListState>({
+                sports: [],
+                totalPages: 1,
+                isLoading: false,
+                error: httpErrorMessage(error),
+              }),
+            ),
+            startWith<ListState>(LOADING_STATE),
           ),
-          startWith<ListState>(LOADING_STATE),
-        ),
       ),
     ),
     { initialValue: LOADING_STATE },
@@ -111,6 +117,11 @@ export class SportListComponent {
 
   markIconBroken(id: string): void {
     this.brokenIcons.update((ids) => new Set(ids).add(id));
+  }
+
+  toggleSort(): void {
+    this.sortOrder.update((order) => (order === 'asc' ? 'desc' : 'asc'));
+    this.page.set(1);
   }
 
   goToPage(page: number): void {

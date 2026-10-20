@@ -39,7 +39,19 @@
     <table class="data-table">
       <thead>
         <tr>
-          <th scope="col">Sport</th>
+          <th
+            scope="col"
+            class="data-table__sortable"
+            [attr.aria-sort]="sortOrder() === 'asc' ? 'ascending' : 'descending'"
+          >
+            <button type="button" class="data-table__sort" (click)="toggleSort()">
+              Sport
+              <span
+                class="data-table__caret"
+                [class.data-table__caret--up]="sortOrder() === 'asc'"
+              ></span>
+            </button>
+          </th>
           <th scope="col">Governing Bodies</th>
           <th scope="col">Organisations</th>
           <th scope="col">Participants</th>

@@ -77,7 +77,11 @@
     text-align: left;
     white-space: nowrap;
 
-    &:not(.data-table__actions)::after {
+    &.data-table__sortable::after {
+      content: none;
+    }
+
+    &:not(.data-table__actions):not(.data-table__sortable)::after {
       content: '';
       position: absolute;
       top: 50%;
@@ -113,6 +117,33 @@
     padding: var(--space-8);
     color: var(--color-text-muted);
     text-align: center;
+  }
+
+  &__sort {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    width: 100%;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+
+    &:hover {
+      color: var(--color-text);
+    }
+  }
+
+  &__caret {
+    border-top: 5px solid currentcolor;
+    border-right: 4px solid transparent;
+    border-left: 4px solid transparent;
+
+    &--up {
+      transform: rotate(180deg);
+    }
   }
 
   &__grip {
