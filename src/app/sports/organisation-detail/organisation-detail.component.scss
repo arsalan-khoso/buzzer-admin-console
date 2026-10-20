@@ -1,0 +1,10 @@
+.member-photo {
+  border-radius: var(--radius-pill);
+  object-fit: cover;
+}
+
+.staff-group__title {
+  margin-top: var(--space-2);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}

@@ -1,6 +1,8 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { catchError, debounceTime, map, of, skip, startWith, switchMap } from 'rxjs';
+import { RouterLink } from '@angular/router';
+import { BulkImportDialogComponent } from '../components/bulk-import-dialog/bulk-import-dialog.component';
 import { ConfirmDialogComponent } from '../../common/components/confirm-dialog/confirm-dialog.component';
 import { ICONS_PATH } from '../../common/constants/navigation.constants';
 import { LayoutService } from '../../common/services/layout.service';
@@ -21,7 +23,12 @@ const LOADING_STATE: ListState = { sports: [], totalPages: 1, isLoading: true, e
 
 @Component({
   selector: 'app-sport-list',
-  imports: [SportFormDialogComponent, ConfirmDialogComponent],
+  imports: [
+    RouterLink,
+    SportFormDialogComponent,
+    ConfirmDialogComponent,
+    BulkImportDialogComponent,
+  ],
   templateUrl: './sport-list.component.html',
   styleUrl: './sport-list.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -86,6 +93,7 @@ export class SportListComponent {
   readonly deletingSport = signal<Sport | null>(null);
   readonly isDeleting = signal(false);
   readonly deleteError = signal('');
+  readonly isImportOpen = signal(false);
 
   constructor() {
     // A new search always starts from the first page
@@ -144,6 +152,13 @@ export class SportListComponent {
         this.deleteError.set(httpErrorMessage(error));
       },
     });
+  }
+
+  onImportClosed(added: boolean): void {
+    this.isImportOpen.set(false);
+    if (added) {
+      this.reload();
+    }
   }
 
   private reload(): void {
