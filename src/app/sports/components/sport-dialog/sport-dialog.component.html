@@ -1,0 +1,120 @@
+<div class="dialog-backdrop"></div>
+<section class="dialog" role="dialog" aria-modal="true" aria-labelledby="sport-dialog-title">
+  <div class="dialog__header">
+    <h2 id="sport-dialog-title" class="dialog__title">
+      {{ sport() ? 'Edit Sport' : 'Add Sport' }}
+    </h2>
+    <button type="button" class="dialog__close" (click)="closed.emit()" aria-label="Close">
+      <img src="assets/icons/ic_close.svg" width="20" height="20" alt="" aria-hidden="true" />
+    </button>
+  </div>
+
+  <form class="dialog__form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <div class="field">
+      <label class="field__label" for="sport-name">Add Name and Emoji:</label>
+      <div class="input-clearable">
+        <input
+          id="sport-name"
+          class="input"
+          [class.input--invalid]="showError('name')"
+          formControlName="name"
+          placeholder="Sport Name"
+        />
+        @if (form.controls.name.value) {
+          <button
+            type="button"
+            class="input-clearable__btn"
+            (click)="clear('name')"
+            aria-label="Clear name"
+          >
+            <img src="assets/icons/ic_clear.svg" width="16" height="16" alt="" aria-hidden="true" />
+          </button>
+        }
+      </div>
+      @if (showError('name')) {
+        <p class="field__error">Sport name is required.</p>
+      }
+    </div>
+
+    <div class="field">
+      <label class="field__label" for="sport-icon">Add Icon:</label>
+      <div class="icon-input">
+        <label class="icon-input__preview" for="sport-icon" aria-hidden="true">
+          @if (form.controls.iconUrl.valid && form.controls.iconUrl.value && !iconFailed()) {
+            <img
+              [src]="form.controls.iconUrl.value"
+              width="20"
+              height="20"
+              alt=""
+              (error)="iconFailed.set(true)"
+            />
+          } @else {
+            <img src="assets/icons/ic_plus.svg" width="16" height="16" alt="" />
+          }
+        </label>
+        <div class="input-clearable">
+          <input
+            id="sport-icon"
+            class="input"
+            [class.input--invalid]="showError('iconUrl')"
+            formControlName="iconUrl"
+            placeholder="Icon URL"
+            (input)="iconFailed.set(false)"
+          />
+          @if (form.controls.iconUrl.value) {
+            <button
+              type="button"
+              class="input-clearable__btn"
+              (click)="clear('iconUrl')"
+              aria-label="Clear icon URL"
+            >
+              <img
+                src="assets/icons/ic_clear.svg"
+                width="16"
+                height="16"
+                alt=""
+                aria-hidden="true"
+              />
+            </button>
+          }
+        </div>
+      </div>
+      @if (showError('iconUrl')) {
+        <p class="field__error">Enter a valid URL starting with http:// or https://.</p>
+      }
+    </div>
+
+    <div class="field">
+      <label class="field__label" for="sport-description">Add Description:</label>
+      <div class="input-clearable">
+        <input
+          id="sport-description"
+          class="input"
+          formControlName="description"
+          placeholder="Description"
+        />
+        @if (form.controls.description.value) {
+          <button
+            type="button"
+            class="input-clearable__btn"
+            (click)="clear('description')"
+            aria-label="Clear description"
+          >
+            <img src="assets/icons/ic_clear.svg" width="16" height="16" alt="" aria-hidden="true" />
+          </button>
+        }
+      </div>
+    </div>
+
+    @if (errorMessage()) {
+      <p class="dialog__error" role="alert">{{ errorMessage() }}</p>
+    }
+
+    <div class="dialog__actions">
+      <button type="button" class="btn" (click)="closed.emit()">Cancel</button>
+      <button type="submit" class="btn btn--primary" [disabled]="isSaving() || form.invalid">
+        Save
+      </button>
+    </div>
+  </form>
+</section>

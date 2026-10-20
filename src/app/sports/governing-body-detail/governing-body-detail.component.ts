@@ -12,6 +12,7 @@ import {
 } from '../../common/components/form-dialog/form-dialog.component';
 import { ICONS_PATH } from '../../common/constants/navigation.constants';
 import { httpErrorMessage } from '../../common/utils/http-error.util';
+import { CompetitionDialogComponent } from '../components/competition-dialog/competition-dialog.component';
 import { GoverningBody, Organisation } from '../models/hierarchy.model';
 import { Sport } from '../models/sport.model';
 import { HierarchyService } from '../services/hierarchy.service';
@@ -38,14 +39,15 @@ interface PendingDelete {
   redirect?: string[];
 }
 
-const ORGANISATION_FIELDS: FormDialogField[] = [
-  { key: 'name', label: 'Name', required: true },
-  { key: 'city', label: 'City' },
-];
-
 @Component({
   selector: 'app-governing-body-detail',
-  imports: [DatePipe, BreadcrumbComponent, FormDialogComponent, ConfirmDialogComponent],
+  imports: [
+    DatePipe,
+    BreadcrumbComponent,
+    FormDialogComponent,
+    ConfirmDialogComponent,
+    CompetitionDialogComponent,
+  ],
   templateUrl: './governing-body-detail.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -55,7 +57,7 @@ export class GoverningBodyDetailComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly params = toSignal(this.route.paramMap, { requireSync: true });
   private readonly sportId = computed(() => this.params().get('sportId') ?? '');
-  private readonly governingBodyId = computed(() => this.params().get('governingBodyId') ?? '');
+  readonly governingBodyId = computed(() => this.params().get('governingBodyId') ?? '');
   private readonly reloadKey = signal(0);
 
   readonly iconsPath = ICONS_PATH;
@@ -103,6 +105,8 @@ export class GoverningBodyDetailComponent {
   ]);
 
   readonly dialog = signal<EditDialog | null>(null);
+  /** Open Add/Edit Competition dialog; `organisation` is empty when adding. */
+  readonly competitionDialog = signal<{ organisation: Organisation | null } | null>(null);
   readonly pendingDelete = signal<PendingDelete | null>(null);
   readonly isDeleting = signal(false);
   readonly deleteError = signal('');
@@ -138,32 +142,11 @@ export class GoverningBodyDetailComponent {
   }
 
   openAddOrganisation(): void {
-    this.dialog.set({
-      title: 'Add Organisation',
-      submitLabel: 'Add',
-      fields: ORGANISATION_FIELDS,
-      initialValue: {},
-      save: (value) =>
-        this.hierarchy.createOrganisation({
-          name: value['name'],
-          city: value['city'] || undefined,
-          governingBodyId: this.governingBodyId(),
-        }),
-    });
+    this.competitionDialog.set({ organisation: null });
   }
 
   openEditOrganisation(organisation: Organisation): void {
-    this.dialog.set({
-      title: 'Edit Organisation',
-      submitLabel: 'Save',
-      fields: ORGANISATION_FIELDS,
-      initialValue: { name: organisation.name, city: organisation.city ?? '' },
-      save: (value) =>
-        this.hierarchy.updateOrganisation(organisation.id, {
-          name: value['name'],
-          city: value['city'] || undefined,
-        }),
-    });
+    this.competitionDialog.set({ organisation });
   }
 
   askDeleteOrganisation(organisation: Organisation): void {
@@ -176,6 +159,7 @@ export class GoverningBodyDetailComponent {
 
   onSaved(): void {
     this.dialog.set(null);
+    this.competitionDialog.set(null);
     this.reload();
   }
 

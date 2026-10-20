@@ -14,7 +14,7 @@
           <button
             type="button"
             class="icon-btn"
-            (click)="openEditOrganisation(organisation)"
+            (click)="openEditOrganisation()"
             [attr.aria-label]="'Edit ' + organisation.name"
           >
             <img
@@ -357,5 +357,13 @@
     [errorMessage]="removeError()"
     (confirmed)="confirmRemove()"
     (cancelled)="removal.set(null)"
+  />
+}
+
+@if (isCompetitionDialogOpen()) {
+  <app-competition-dialog
+    [organisation]="organisation()"
+    (saved)="onSaved()"
+    (closed)="isCompetitionDialogOpen.set(false)"
   />
 }

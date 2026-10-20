@@ -7,12 +7,9 @@ import { ConfirmDialogComponent } from '../../common/components/confirm-dialog/c
 import { ICONS_PATH } from '../../common/constants/navigation.constants';
 import { LayoutService } from '../../common/services/layout.service';
 import { httpErrorMessage } from '../../common/utils/http-error.util';
-import {
-  FormDialogComponent,
-  FormDialogValue,
-} from '../../common/components/form-dialog/form-dialog.component';
-import { SPORT_ACCENTS, SPORT_FORM_FIELDS, SPORTS_PAGE_SIZE } from '../constants/sports.constants';
-import { CatalogueTotals, Sport, toSportInput } from '../models/sport.model';
+import { SportDialogComponent } from '../components/sport-dialog/sport-dialog.component';
+import { SPORT_ACCENTS, SPORTS_PAGE_SIZE } from '../constants/sports.constants';
+import { CatalogueTotals, Sport } from '../models/sport.model';
 import { SportsService } from '../services/sports.service';
 
 interface ListState {
@@ -26,7 +23,7 @@ const LOADING_STATE: ListState = { sports: [], totalPages: 1, isLoading: true, e
 
 @Component({
   selector: 'app-sport-list',
-  imports: [FormDialogComponent, ConfirmDialogComponent, BulkImportDialogComponent],
+  imports: [SportDialogComponent, ConfirmDialogComponent, BulkImportDialogComponent],
   templateUrl: './sport-list.component.html',
   styleUrl: './sport-list.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -88,21 +85,7 @@ export class SportListComponent {
     { initialValue: null },
   );
 
-  readonly sportFields = SPORT_FORM_FIELDS;
   readonly editingSport = signal<Sport | null>(null);
-  readonly sportFormValue = computed(() => {
-    const sport = this.editingSport();
-    const value: FormDialogValue = sport
-      ? { name: sport.name, description: sport.description ?? '', iconUrl: sport.iconUrl ?? '' }
-      : {};
-    return value;
-  });
-  readonly saveSport = (value: FormDialogValue) => {
-    const sport = this.editingSport();
-    return sport
-      ? this.sportsService.update(sport.id, toSportInput(value))
-      : this.sportsService.create(toSportInput(value));
-  };
   readonly isFormOpen = signal(false);
   readonly deletingSport = signal<Sport | null>(null);
   readonly isDeleting = signal(false);
