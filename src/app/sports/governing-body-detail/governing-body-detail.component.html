@@ -1,7 +1,81 @@
 <section class="page">
-  <div class="page__toolbar">
-    <app-breadcrumb [items]="breadcrumb()" />
-    <button type="button" class="btn btn--small" (click)="isAddOpen.set(true)">
+  <app-breadcrumb [items]="breadcrumb()" />
+
+  @if (governingBody(); as body) {
+    <div class="entity-layout">
+      <header class="entity-card">
+        <div class="entity-card__head">
+          <h2 class="entity-card__name">
+            <span class="entity-card__logo" aria-hidden="true">{{
+              body.name.charAt(0).toUpperCase()
+            }}</span>
+            {{ body.name }}
+          </h2>
+          <span class="entity-card__actions">
+            <button
+              type="button"
+              class="icon-btn"
+              (click)="openEditGoverningBody(body)"
+              [attr.aria-label]="'Edit ' + body.name"
+            >
+              <img
+                [src]="iconsPath + '/ic_edit.svg'"
+                width="18"
+                height="18"
+                alt=""
+                aria-hidden="true"
+              />
+            </button>
+            <button
+              type="button"
+              class="icon-btn"
+              (click)="askDeleteGoverningBody(body)"
+              [attr.aria-label]="'Delete ' + body.name"
+            >
+              <img
+                [src]="iconsPath + '/ic_delete.svg'"
+                width="18"
+                height="18"
+                alt=""
+                aria-hidden="true"
+              />
+            </button>
+          </span>
+        </div>
+        <dl class="entity-card__meta">
+          <div>
+            <dt>Created:</dt>
+            <dd>{{ body.createdAt | date: "MMM d, y. 'at' HH:mm" }}</dd>
+          </div>
+          <div>
+            <dt>Updated:</dt>
+            <dd>{{ body.updatedAt | date: "MMM d, y. 'at' HH:mm" }}</dd>
+          </div>
+          <div>
+            <dt>Country:</dt>
+            <dd>{{ body.country ?? '—' }}</dd>
+          </div>
+        </dl>
+      </header>
+
+      <div class="entity-layout__stats">
+        <div class="stat-card">
+          <span class="stat-card__value">{{ organisations().length }}</span>
+          <span class="stat-card__label">Competitions</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-card__value">{{ participantTotal() }}</span>
+          <span class="stat-card__label">Participants</span>
+        </div>
+      </div>
+    </div>
+  } @else if (errorMessage()) {
+    <p class="dialog__error" role="alert">{{ errorMessage() }}</p>
+  }
+
+  <div class="section-header">
+    <h3>Competitions</h3>
+    <button type="button" class="btn btn--small" (click)="openAddOrganisation()">
       <img
         [src]="iconsPath + '/ic_plus_circle.svg'"
         width="16"
@@ -13,50 +87,64 @@
     </button>
   </div>
 
-  @if (governingBody(); as body) {
-    <header class="detail-header">
-      <div class="detail-header__title">
-        <span class="avatar" aria-hidden="true">{{ body.name.charAt(0).toUpperCase() }}</span>
-        <h2>{{ body.name }}</h2>
-      </div>
-      <dl class="detail-header__meta">
-        <dt>Country</dt>
-        <dd>{{ body.country ?? '—' }}</dd>
-        <dt>Created</dt>
-        <dd>{{ body.createdAt | date: 'MMM d, y, HH:mm' }}</dd>
-        <dt>Updated</dt>
-        <dd>{{ body.updatedAt | date: 'MMM d, y, HH:mm' }}</dd>
-      </dl>
-    </header>
-  }
-
-  <h3>Competitions / Organisations</h3>
   <div class="table-wrap">
     <table class="data-table">
       <thead>
         <tr>
-          <th scope="col">Organisation</th>
-          <th scope="col">City</th>
-          <th scope="col">Teams</th>
+          <th scope="col">Competitions</th>
           <th scope="col">Participants</th>
+          <th scope="col" class="data-table__actions">Actions</th>
         </tr>
       </thead>
       <tbody>
         @for (organisation of organisations(); track organisation.id) {
-          <tr>
-            <td>
-              <a class="data-table__link" [routerLink]="['organisations', organisation.id]">
-                {{ organisation.name }}
-              </a>
-            </td>
-            <td>{{ organisation.city ?? '—' }}</td>
-            <td>{{ organisation.teamCount ?? 0 }}</td>
+          <tr
+            class="data-table__row--link"
+            tabindex="0"
+            (click)="openOrganisation(organisation)"
+            (keydown.enter)="openOrganisation(organisation)"
+          >
+            <td>{{ organisation.name }}</td>
             <td>{{ organisation.participantCount ?? 0 }}</td>
+            <td
+              class="data-table__actions"
+              (click)="$event.stopPropagation()"
+              (keydown.enter)="$event.stopPropagation()"
+            >
+              <button
+                type="button"
+                class="icon-btn"
+                (click)="openEditOrganisation(organisation)"
+                [attr.aria-label]="'Edit ' + organisation.name"
+              >
+                <img
+                  [src]="iconsPath + '/ic_edit.svg'"
+                  width="18"
+                  height="18"
+                  alt=""
+                  aria-hidden="true"
+                />
+              </button>
+              <button
+                type="button"
+                class="icon-btn"
+                (click)="askDeleteOrganisation(organisation)"
+                [attr.aria-label]="'Delete ' + organisation.name"
+              >
+                <img
+                  [src]="iconsPath + '/ic_delete.svg'"
+                  width="18"
+                  height="18"
+                  alt=""
+                  aria-hidden="true"
+                />
+              </button>
+            </td>
           </tr>
         } @empty {
           <tr>
-            <td class="data-table__empty" colspan="4">
-              {{ isLoading() ? 'Loading…' : errorMessage() || 'No organisations yet.' }}
+            <td class="data-table__empty" colspan="3">
+              {{ isLoading() ? 'Loading…' : errorMessage() || 'No competitions yet.' }}
             </td>
           </tr>
         }
@@ -65,13 +153,25 @@
   </div>
 </section>
 
-@if (isAddOpen()) {
+@if (dialog(); as config) {
   <app-form-dialog
-    title="Add Organisation"
-    submitLabel="Add"
-    [fields]="organisationFields"
-    [save]="addOrganisation"
-    (saved)="onAdded()"
-    (closed)="isAddOpen.set(false)"
+    [title]="config.title"
+    [submitLabel]="config.submitLabel"
+    [fields]="config.fields"
+    [initialValue]="config.initialValue"
+    [save]="config.save"
+    (saved)="onSaved()"
+    (closed)="dialog.set(null)"
+  />
+}
+
+@if (pendingDelete(); as pending) {
+  <app-confirm-dialog
+    [title]="pending.title"
+    [message]="pending.message"
+    [isBusy]="isDeleting()"
+    [errorMessage]="deleteError()"
+    (confirmed)="confirmDelete()"
+    (cancelled)="pendingDelete.set(null)"
   />
 }

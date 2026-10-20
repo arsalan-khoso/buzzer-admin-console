@@ -1,27 +1,37 @@
 <section class="page">
-  <div class="page__toolbar">
-    <app-breadcrumb [items]="breadcrumb()" />
-  </div>
+  <app-breadcrumb [items]="breadcrumb()" />
 
   @if (participant(); as participant) {
-    <header class="detail-header">
-      <div class="detail-header__title">
-        <span class="avatar" aria-hidden="true">{{
-          participant.firstName.charAt(0).toUpperCase()
-        }}</span>
-        <h2>{{ participant.firstName }} {{ participant.lastName }}</h2>
+    <header class="entity-card">
+      <div class="entity-card__head">
+        <h2 class="entity-card__name">
+          <span class="entity-card__logo" aria-hidden="true">{{
+            participant.firstName.charAt(0).toUpperCase()
+          }}</span>
+          {{ participant.firstName }} {{ participant.lastName }}
+        </h2>
       </div>
-      <dl class="detail-header__meta">
-        <dt>Jersey number</dt>
-        <dd>{{ participant.jerseyNumber ?? '—' }}</dd>
-        <dt>Position</dt>
-        <dd>{{ participant.position ?? '—' }}</dd>
-        <dt>Team</dt>
-        <dd>{{ participant.team?.name ?? '—' }}</dd>
-        <dt>Created</dt>
-        <dd>{{ participant.createdAt | date: 'MMM d, y, HH:mm' }}</dd>
-        <dt>Updated</dt>
-        <dd>{{ participant.updatedAt | date: 'MMM d, y, HH:mm' }}</dd>
+      <dl class="entity-card__meta">
+        <div>
+          <dt>Jersey number:</dt>
+          <dd>{{ participant.jerseyNumber ?? '—' }}</dd>
+        </div>
+        <div>
+          <dt>Position:</dt>
+          <dd>{{ participant.position ?? '—' }}</dd>
+        </div>
+        <div>
+          <dt>Team:</dt>
+          <dd>{{ participant.team?.name ?? '—' }}</dd>
+        </div>
+        <div>
+          <dt>Created:</dt>
+          <dd>{{ participant.createdAt | date: "MMM d, y. 'at' HH:mm" }}</dd>
+        </div>
+        <div>
+          <dt>Updated:</dt>
+          <dd>{{ participant.updatedAt | date: "MMM d, y. 'at' HH:mm" }}</dd>
+        </div>
       </dl>
     </header>
   } @else if (errorMessage()) {

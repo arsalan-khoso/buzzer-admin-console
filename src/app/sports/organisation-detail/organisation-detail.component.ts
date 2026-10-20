@@ -1,7 +1,7 @@
 import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Observable, catchError, forkJoin, map, of, switchMap } from 'rxjs';
 import { BreadcrumbComponent } from '../../common/components/breadcrumb/breadcrumb.component';
 import { ConfirmDialogComponent } from '../../common/components/confirm-dialog/confirm-dialog.component';
@@ -28,8 +28,6 @@ import {
 import { Sport } from '../models/sport.model';
 import { HierarchyService } from '../services/hierarchy.service';
 
-type Tab = 'participants' | 'squad' | 'staff';
-
 interface DialogConfig {
   title: string;
   submitLabel: string;
@@ -42,11 +40,12 @@ interface RemoveConfig {
   title: string;
   message: string;
   remove: () => Observable<void>;
+  redirect?: string[];
 }
 
 @Component({
   selector: 'app-organisation-detail',
-  imports: [RouterLink, DatePipe, BreadcrumbComponent, FormDialogComponent, ConfirmDialogComponent],
+  imports: [DatePipe, BreadcrumbComponent, FormDialogComponent, ConfirmDialogComponent],
   templateUrl: './organisation-detail.component.html',
   styleUrl: './organisation-detail.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -54,6 +53,7 @@ interface RemoveConfig {
 export class OrganisationDetailComponent {
   private readonly hierarchy = inject(HierarchyService);
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
 
   readonly iconsPath = ICONS_PATH;
   readonly staffLabels = STAFF_CATEGORY_LABELS;
@@ -77,7 +77,6 @@ export class OrganisationDetailComponent {
   readonly isLoading = signal(true);
   readonly errorMessage = signal('');
 
-  readonly activeTab = signal<Tab>('participants');
   readonly dialog = signal<DialogConfig | null>(null);
   readonly removal = signal<RemoveConfig | null>(null);
   readonly isRemoving = signal(false);
@@ -151,32 +150,67 @@ export class OrganisationDetailComponent {
     });
   }
 
+  openParticipant(participant: Participant): void {
+    void this.router.navigate(['participants', participant.id], { relativeTo: this.route });
+  }
+
+  openEditOrganisation(organisation: Organisation): void {
+    this.dialog.set({
+      title: 'Edit Organisation',
+      submitLabel: 'Save',
+      fields: [
+        { key: 'name', label: 'Name', required: true },
+        { key: 'city', label: 'City' },
+      ],
+      initialValue: { name: organisation.name, city: organisation.city ?? '' },
+      save: (value) =>
+        this.hierarchy.updateOrganisation(organisation.id, {
+          name: value['name'],
+          city: value['city'] || undefined,
+        }),
+    });
+  }
+
+  askDeleteOrganisation(organisation: Organisation): void {
+    this.askRemove({
+      title: 'Delete Organisation',
+      message: `Delete ${organisation.name}? It will be removed from every list.`,
+      remove: () => this.hierarchy.deleteOrganisation(organisation.id),
+      redirect: ['/sports', this.sportId(), 'governing-bodies', this.governingBodyId()],
+    });
+  }
+
+  openEditParticipant(participant: Participant): void {
+    this.dialog.set({
+      title: 'Edit Participant',
+      submitLabel: 'Save',
+      fields: this.participantFields(),
+      initialValue: {
+        firstName: participant.firstName,
+        lastName: participant.lastName,
+        jerseyNumber: participant.jerseyNumber?.toString() ?? '',
+        position: participant.position ?? '',
+        teamId: participant.teamId,
+      },
+      save: (value) => this.hierarchy.updateParticipant(participant.id, toParticipantInput(value)),
+    });
+  }
+
+  askDeleteParticipant(participant: Participant): void {
+    this.askRemove({
+      title: 'Delete Participant',
+      message: `Delete ${participant.firstName} ${participant.lastName}?`,
+      remove: () => this.hierarchy.deleteParticipant(participant.id),
+    });
+  }
+
   openAddParticipant(): void {
     this.dialog.set({
       title: 'Add Participant',
       submitLabel: 'Add',
-      fields: [
-        { key: 'firstName', label: 'First name', required: true },
-        { key: 'lastName', label: 'Last name', required: true },
-        { key: 'jerseyNumber', label: 'Jersey number', type: 'number' },
-        { key: 'position', label: 'Position' },
-        {
-          key: 'teamId',
-          label: 'Team',
-          type: 'select',
-          required: true,
-          options: this.teams().map((team) => ({ value: team.id, label: team.name })),
-        },
-      ],
+      fields: this.participantFields(),
       initialValue: { teamId: this.teams().length === 1 ? this.teams()[0].id : '' },
-      save: (value) =>
-        this.hierarchy.createParticipant({
-          firstName: value['firstName'],
-          lastName: value['lastName'],
-          jerseyNumber: value['jerseyNumber'] ? Number(value['jerseyNumber']) : undefined,
-          position: value['position'] || undefined,
-          teamId: value['teamId'],
-        }),
+      save: (value) => this.hierarchy.createParticipant(toParticipantInput(value)),
     });
   }
 
@@ -311,13 +345,33 @@ export class OrganisationDetailComponent {
       next: () => {
         this.isRemoving.set(false);
         this.removal.set(null);
-        this.load();
+        if (removal.redirect) {
+          void this.router.navigate(removal.redirect);
+        } else {
+          this.load();
+        }
       },
       error: (error: unknown) => {
         this.isRemoving.set(false);
         this.removeError.set(httpErrorMessage(error));
       },
     });
+  }
+
+  private participantFields(): FormDialogField[] {
+    return [
+      { key: 'firstName', label: 'First name', required: true },
+      { key: 'lastName', label: 'Last name', required: true },
+      { key: 'jerseyNumber', label: 'Jersey number', type: 'number' },
+      { key: 'position', label: 'Position' },
+      {
+        key: 'teamId',
+        label: 'Team',
+        type: 'select',
+        required: true,
+        options: this.teams().map((team) => ({ value: team.id, label: team.name })),
+      },
+    ];
   }
 
   private askRemove(config: RemoveConfig): void {
@@ -333,4 +387,14 @@ function userLabel(user: UserOption): string {
 
 function toIsoDate(value: string): string | null {
   return value ? new Date(`${value}T00:00:00Z`).toISOString() : null;
+}
+
+function toParticipantInput(value: FormDialogValue) {
+  return {
+    firstName: value['firstName'],
+    lastName: value['lastName'],
+    jerseyNumber: value['jerseyNumber'] ? Number(value['jerseyNumber']) : undefined,
+    position: value['position'] || undefined,
+    teamId: value['teamId'],
+  };
 }
