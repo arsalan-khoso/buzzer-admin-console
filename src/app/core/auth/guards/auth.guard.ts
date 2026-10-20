@@ -8,7 +8,10 @@ import {
 } from '../../../auth/constants/auth.constants';
 import { AuthService } from '../services/auth.service';
 
-/** Lets signed-in users through, loading their profile from GET /auth/me on the first visit. */
+/**
+ * Lets signed-in users through, loading their profile from GET /auth/me on the first visit.
+ * An expired access token is renewed by the interceptor, so only a failed refresh ends here.
+ */
 export const authGuard: CanActivateFn = (_route, state) => {
   const auth = inject(AuthService);
   const router = inject(Router);
@@ -16,19 +19,17 @@ export const authGuard: CanActivateFn = (_route, state) => {
   if (!auth.isAuthenticated()) {
     return router.createUrlTree([LOGIN_ROUTE], { queryParams: { returnUrl: state.url } });
   }
-  if (auth.isTokenExpired()) {
-    auth.logout();
-    return router.createUrlTree([LOGIN_ROUTE], {
-      queryParams: { returnUrl: state.url, reason: SESSION_EXPIRED_PARAM },
-    });
-  }
-  if (auth.currentUser()) {
+  if (auth.currentUser() && (!auth.isTokenExpired() || auth.canRefresh())) {
     return true;
   }
   return auth.loadCurrentUser().pipe(
     map(() => true),
     catchError(() =>
-      of(router.createUrlTree([LOGIN_ROUTE], { queryParams: { returnUrl: state.url } })),
+      of(
+        router.createUrlTree([LOGIN_ROUTE], {
+          queryParams: { returnUrl: state.url, reason: SESSION_EXPIRED_PARAM },
+        }),
+      ),
     ),
   );
 };
@@ -36,7 +37,6 @@ export const authGuard: CanActivateFn = (_route, state) => {
 /** Keeps signed-in users away from the login page. */
 export const guestGuard: CanActivateFn = () => {
   const auth = inject(AuthService);
-  return auth.isAuthenticated() && !auth.isTokenExpired()
-    ? inject(Router).createUrlTree([HOME_ROUTE])
-    : true;
+  const hasLiveSession = auth.isAuthenticated() && (!auth.isTokenExpired() || auth.canRefresh());
+  return hasLiveSession ? inject(Router).createUrlTree([HOME_ROUTE]) : true;
 };
