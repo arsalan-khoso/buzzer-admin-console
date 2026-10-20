@@ -78,6 +78,14 @@ export class HierarchyService {
     return this.post<Organisation>(SPORTS_ENDPOINTS.organisations, input);
   }
 
+  updateOrganisation(id: string, input: { name: string; city?: string }): Observable<Organisation> {
+    return this.patch<Organisation>(`${SPORTS_ENDPOINTS.organisations}/${id}`, input);
+  }
+
+  deleteOrganisation(id: string): Observable<void> {
+    return this.remove(`${SPORTS_ENDPOINTS.organisations}/${id}`);
+  }
+
   listTeams(organizationId: string): Observable<Team[]> {
     return this.get<Team[]>(SPORTS_ENDPOINTS.teams, { organizationId, limit: MAX_LIMIT });
   }
@@ -102,6 +110,23 @@ export class HierarchyService {
     teamId: string;
   }): Observable<Participant> {
     return this.post<Participant>(SPORTS_ENDPOINTS.participants, input);
+  }
+
+  updateParticipant(
+    id: string,
+    input: {
+      firstName: string;
+      lastName: string;
+      jerseyNumber?: number;
+      position?: string;
+      teamId: string;
+    },
+  ): Observable<Participant> {
+    return this.patch<Participant>(`${SPORTS_ENDPOINTS.participants}/${id}`, input);
+  }
+
+  deleteParticipant(id: string): Observable<void> {
+    return this.remove(`${SPORTS_ENDPOINTS.participants}/${id}`);
   }
 
   listSquad(organisationId: string): Observable<SquadMember[]> {

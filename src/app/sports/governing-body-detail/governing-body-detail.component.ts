@@ -1,9 +1,10 @@
 import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { ActivatedRoute, RouterLink } from '@angular/router';
-import { catchError, combineLatest, forkJoin, map, of, switchMap } from 'rxjs';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Observable, catchError, combineLatest, forkJoin, map, of, switchMap } from 'rxjs';
 import { BreadcrumbComponent } from '../../common/components/breadcrumb/breadcrumb.component';
+import { ConfirmDialogComponent } from '../../common/components/confirm-dialog/confirm-dialog.component';
 import {
   FormDialogComponent,
   FormDialogField,
@@ -22,24 +23,42 @@ interface GoverningBodyState {
   error: string;
 }
 
+interface EditDialog {
+  title: string;
+  submitLabel: string;
+  fields: FormDialogField[];
+  initialValue: FormDialogValue;
+  save: (value: FormDialogValue) => Observable<unknown>;
+}
+
+interface PendingDelete {
+  title: string;
+  message: string;
+  remove: () => Observable<void>;
+  redirect?: string[];
+}
+
+const ORGANISATION_FIELDS: FormDialogField[] = [
+  { key: 'name', label: 'Name', required: true },
+  { key: 'city', label: 'City' },
+];
+
 @Component({
   selector: 'app-governing-body-detail',
-  imports: [RouterLink, DatePipe, BreadcrumbComponent, FormDialogComponent],
+  imports: [DatePipe, BreadcrumbComponent, FormDialogComponent, ConfirmDialogComponent],
   templateUrl: './governing-body-detail.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GoverningBodyDetailComponent {
   private readonly hierarchy = inject(HierarchyService);
-  private readonly params = toSignal(inject(ActivatedRoute).paramMap, { requireSync: true });
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
+  private readonly params = toSignal(this.route.paramMap, { requireSync: true });
   private readonly sportId = computed(() => this.params().get('sportId') ?? '');
   private readonly governingBodyId = computed(() => this.params().get('governingBodyId') ?? '');
   private readonly reloadKey = signal(0);
 
   readonly iconsPath = ICONS_PATH;
-  readonly organisationFields: FormDialogField[] = [
-    { key: 'name', label: 'Name', required: true },
-    { key: 'city', label: 'City' },
-  ];
 
   private readonly state = toSignal(
     combineLatest([
@@ -71,22 +90,124 @@ export class GoverningBodyDetailComponent {
   readonly organisations = computed(() => this.state()?.organisations ?? []);
   readonly errorMessage = computed(() => this.state()?.error ?? '');
   readonly isLoading = computed(() => this.state() === undefined);
+  readonly participantTotal = computed(() =>
+    this.organisations().reduce(
+      (sum, organisation) => sum + (organisation.participantCount ?? 0),
+      0,
+    ),
+  );
   readonly breadcrumb = computed(() => [
     { label: 'Sport', link: ['/sports'] },
     { label: this.state()?.sport?.name ?? '…', link: ['/sports', this.sportId()] },
     { label: this.governingBody()?.name ?? '…' },
   ]);
 
-  readonly isAddOpen = signal(false);
-  readonly addOrganisation = (value: FormDialogValue) =>
-    this.hierarchy.createOrganisation({
-      name: value['name'],
-      city: value['city'] || undefined,
-      governingBodyId: this.governingBodyId(),
-    });
+  readonly dialog = signal<EditDialog | null>(null);
+  readonly pendingDelete = signal<PendingDelete | null>(null);
+  readonly isDeleting = signal(false);
+  readonly deleteError = signal('');
 
-  onAdded(): void {
-    this.isAddOpen.set(false);
+  openOrganisation(organisation: Organisation): void {
+    void this.router.navigate(['organisations', organisation.id], { relativeTo: this.route });
+  }
+
+  openEditGoverningBody(body: GoverningBody): void {
+    this.dialog.set({
+      title: 'Edit Governing Body',
+      submitLabel: 'Save',
+      fields: [
+        { key: 'name', label: 'Name', required: true },
+        { key: 'country', label: 'Country' },
+      ],
+      initialValue: { name: body.name, country: body.country ?? '' },
+      save: (value) =>
+        this.hierarchy.updateGoverningBody(body.id, {
+          name: value['name'],
+          country: value['country'] || undefined,
+        }),
+    });
+  }
+
+  askDeleteGoverningBody(body: GoverningBody): void {
+    this.askDelete({
+      title: 'Delete Governing Body',
+      message: `Delete ${body.name}? It will be removed from every list.`,
+      remove: () => this.hierarchy.deleteGoverningBody(body.id),
+      redirect: ['/sports', this.sportId()],
+    });
+  }
+
+  openAddOrganisation(): void {
+    this.dialog.set({
+      title: 'Add Organisation',
+      submitLabel: 'Add',
+      fields: ORGANISATION_FIELDS,
+      initialValue: {},
+      save: (value) =>
+        this.hierarchy.createOrganisation({
+          name: value['name'],
+          city: value['city'] || undefined,
+          governingBodyId: this.governingBodyId(),
+        }),
+    });
+  }
+
+  openEditOrganisation(organisation: Organisation): void {
+    this.dialog.set({
+      title: 'Edit Organisation',
+      submitLabel: 'Save',
+      fields: ORGANISATION_FIELDS,
+      initialValue: { name: organisation.name, city: organisation.city ?? '' },
+      save: (value) =>
+        this.hierarchy.updateOrganisation(organisation.id, {
+          name: value['name'],
+          city: value['city'] || undefined,
+        }),
+    });
+  }
+
+  askDeleteOrganisation(organisation: Organisation): void {
+    this.askDelete({
+      title: 'Delete Organisation',
+      message: `Delete ${organisation.name}? It will be removed from every list.`,
+      remove: () => this.hierarchy.deleteOrganisation(organisation.id),
+    });
+  }
+
+  onSaved(): void {
+    this.dialog.set(null);
+    this.reload();
+  }
+
+  confirmDelete(): void {
+    const pending = this.pendingDelete();
+    if (!pending) {
+      return;
+    }
+    this.isDeleting.set(true);
+    pending.remove().subscribe({
+      next: () => {
+        this.isDeleting.set(false);
+        this.pendingDelete.set(null);
+        if (pending.redirect) {
+          void this.router.navigate(pending.redirect);
+        } else {
+          this.reload();
+        }
+      },
+      error: (error: unknown) => {
+        this.isDeleting.set(false);
+        this.deleteError.set(httpErrorMessage(error));
+      },
+    });
+  }
+
+  private askDelete(pending: PendingDelete): void {
+    this.deleteError.set('');
+    this.pendingDelete.set(pending);
+  }
+
+  private reload(): void {
     this.reloadKey.update((key) => key + 1);
   }
 }
