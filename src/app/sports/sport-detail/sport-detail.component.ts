@@ -12,9 +12,10 @@ import {
 } from '../../common/components/form-dialog/form-dialog.component';
 import { ICONS_PATH } from '../../common/constants/navigation.constants';
 import { httpErrorMessage } from '../../common/utils/http-error.util';
-import { SPORT_ACCENTS, SPORT_FORM_FIELDS } from '../constants/sports.constants';
+import { SportDialogComponent } from '../components/sport-dialog/sport-dialog.component';
+import { SPORT_ACCENTS } from '../constants/sports.constants';
 import { GoverningBody } from '../models/hierarchy.model';
-import { Sport, toSportInput } from '../models/sport.model';
+import { Sport } from '../models/sport.model';
 import { HierarchyService } from '../services/hierarchy.service';
 import { SportsService } from '../services/sports.service';
 
@@ -41,7 +42,13 @@ interface PendingDelete {
 
 @Component({
   selector: 'app-sport-detail',
-  imports: [DatePipe, BreadcrumbComponent, FormDialogComponent, ConfirmDialogComponent],
+  imports: [
+    DatePipe,
+    BreadcrumbComponent,
+    FormDialogComponent,
+    ConfirmDialogComponent,
+    SportDialogComponent,
+  ],
   templateUrl: './sport-detail.component.html',
   styleUrl: './sport-detail.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -102,18 +109,6 @@ export class SportDetailComponent {
     { label: 'Sport', link: ['/sports'] },
     { label: this.sport()?.name ?? '…' },
   ]);
-
-  readonly sportFields = SPORT_FORM_FIELDS;
-  readonly sportFormValue = computed<FormDialogValue>(() => {
-    const sport = this.sport();
-    return {
-      name: sport?.name ?? '',
-      description: sport?.description ?? '',
-      iconUrl: sport?.iconUrl ?? '',
-    };
-  });
-  readonly saveSport = (value: FormDialogValue) =>
-    this.sportsService.update(this.sportId(), toSportInput(value));
 
   readonly iconFailed = signal(false);
   readonly isSportFormOpen = signal(false);

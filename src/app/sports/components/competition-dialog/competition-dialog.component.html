@@ -1,0 +1,85 @@
+<div class="dialog-backdrop"></div>
+<section
+  class="dialog dialog--wide"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="competition-dialog-title"
+>
+  <div class="dialog__header">
+    <h2 id="competition-dialog-title" class="dialog__title">
+      {{ organisation() ? 'Edit Competition' : 'Add Competition' }}
+    </h2>
+    <button type="button" class="dialog__close" (click)="closed.emit()" aria-label="Close">
+      <img src="assets/icons/ic_close.svg" width="20" height="20" alt="" aria-hidden="true" />
+    </button>
+  </div>
+
+  <form class="dialog__form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <div class="competition-form">
+      <button
+        type="button"
+        class="upload-box"
+        disabled
+        title="Image upload is not available in the API yet"
+      >
+        <img src="assets/icons/ic_image.svg" width="20" height="20" alt="" aria-hidden="true" />
+        <span class="upload-box__title">Upload Image</span>
+        <span class="upload-box__hint">Recommended size is 1500×1500 px</span>
+      </button>
+
+      <div class="competition-form__fields">
+        <div class="input-clearable">
+          <input
+            class="input"
+            formControlName="name"
+            placeholder="Competition Name"
+            aria-label="Competition name"
+          />
+          @if (form.controls.name.value) {
+            <button
+              type="button"
+              class="input-clearable__btn"
+              (click)="clearName()"
+              aria-label="Clear name"
+            >
+              <img
+                src="assets/icons/ic_clear.svg"
+                width="16"
+                height="16"
+                alt=""
+                aria-hidden="true"
+              />
+            </button>
+          }
+        </div>
+
+        <button
+          type="button"
+          class="link-row"
+          disabled
+          title="Linking a Buzzer profile is not available in the API yet"
+        >
+          Link Buzzer Profile
+          <img
+            src="assets/icons/ic_plus_circle.svg"
+            width="20"
+            height="20"
+            alt=""
+            aria-hidden="true"
+          />
+        </button>
+      </div>
+    </div>
+
+    @if (errorMessage()) {
+      <p class="dialog__error" role="alert">{{ errorMessage() }}</p>
+    }
+
+    <div class="dialog__actions">
+      <button type="button" class="btn" (click)="closed.emit()">Cancel</button>
+      <button type="submit" class="btn btn--primary" [disabled]="isSaving() || form.invalid">
+        Save
+      </button>
+    </div>
+  </form>
+</section>

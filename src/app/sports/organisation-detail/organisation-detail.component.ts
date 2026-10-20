@@ -12,6 +12,7 @@ import {
 } from '../../common/components/form-dialog/form-dialog.component';
 import { ICONS_PATH } from '../../common/constants/navigation.constants';
 import { httpErrorMessage } from '../../common/utils/http-error.util';
+import { CompetitionDialogComponent } from '../components/competition-dialog/competition-dialog.component';
 import { AuthService } from '../../core/auth/services/auth.service';
 import { MEMBER_WRITE_ROLES, STAFF_CATEGORY_LABELS } from '../constants/sports.constants';
 import {
@@ -45,7 +46,13 @@ interface RemoveConfig {
 
 @Component({
   selector: 'app-organisation-detail',
-  imports: [DatePipe, BreadcrumbComponent, FormDialogComponent, ConfirmDialogComponent],
+  imports: [
+    DatePipe,
+    BreadcrumbComponent,
+    FormDialogComponent,
+    ConfirmDialogComponent,
+    CompetitionDialogComponent,
+  ],
   templateUrl: './organisation-detail.component.html',
   styleUrl: './organisation-detail.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -78,6 +85,7 @@ export class OrganisationDetailComponent {
   readonly errorMessage = signal('');
 
   readonly dialog = signal<DialogConfig | null>(null);
+  readonly isCompetitionDialogOpen = signal(false);
   readonly removal = signal<RemoveConfig | null>(null);
   readonly isRemoving = signal(false);
   readonly removeError = signal('');
@@ -154,21 +162,8 @@ export class OrganisationDetailComponent {
     void this.router.navigate(['participants', participant.id], { relativeTo: this.route });
   }
 
-  openEditOrganisation(organisation: Organisation): void {
-    this.dialog.set({
-      title: 'Edit Organisation',
-      submitLabel: 'Save',
-      fields: [
-        { key: 'name', label: 'Name', required: true },
-        { key: 'city', label: 'City' },
-      ],
-      initialValue: { name: organisation.name, city: organisation.city ?? '' },
-      save: (value) =>
-        this.hierarchy.updateOrganisation(organisation.id, {
-          name: value['name'],
-          city: value['city'] || undefined,
-        }),
-    });
+  openEditOrganisation(): void {
+    this.isCompetitionDialogOpen.set(true);
   }
 
   askDeleteOrganisation(organisation: Organisation): void {
@@ -332,6 +327,7 @@ export class OrganisationDetailComponent {
 
   onSaved(): void {
     this.dialog.set(null);
+    this.isCompetitionDialogOpen.set(false);
     this.load();
   }
 
