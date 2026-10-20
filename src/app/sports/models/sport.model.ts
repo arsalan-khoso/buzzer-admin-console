@@ -22,3 +22,15 @@ export interface CatalogueTotals {
   organisations: number;
   participants: number;
 }
+
+/** Builds the API payload from the sport dialog values; empty optional fields are left out. */
+export function toSportInput(value: Record<string, string>): SportInput {
+  const input: SportInput = { name: value['name'] };
+  if (value['description']) {
+    input.description = value['description'];
+  }
+  if (value['iconUrl']) {
+    input.iconUrl = value['iconUrl'];
+  }
+  return input;
+}

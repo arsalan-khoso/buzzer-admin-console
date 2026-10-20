@@ -1,3 +1,5 @@
+import { FormDialogField } from '../../common/components/form-dialog/form-dialog.component';
+
 export const SPORTS_ENDPOINTS = {
   sports: 'organizations/sports',
   governingBodies: 'organizations/governing-bodies',
@@ -22,3 +24,10 @@ export const IMPORT_REQUEST_DELAY_MS = 220;
 
 /** Squad and staff writes need an ADMIN or ORG token; OPERATOR and VIEWER get 403. */
 export const MEMBER_WRITE_ROLES: readonly string[] = ['ADMIN', 'ORG'];
+
+/** Add/Edit Sport dialog fields from the task doc: Name, Description, Icon URL. */
+export const SPORT_FORM_FIELDS: FormDialogField[] = [
+  { key: 'name', label: 'Name', required: true },
+  { key: 'description', label: 'Description', type: 'textarea' },
+  { key: 'iconUrl', label: 'Icon URL', type: 'url' },
+];
