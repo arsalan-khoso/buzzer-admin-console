@@ -9,19 +9,19 @@ import {
   output,
   signal,
 } from '@angular/core';
-import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { finalize } from 'rxjs';
 import { httpErrorMessage } from '../../../common/utils/http-error.util';
-import { SPORT_ACCENTS } from '../../constants/sports.constants';
-import { Sport, toSportInput } from '../../models/sport.model';
+import { Sport } from '../../models/sport.model';
 import { SportsService } from '../../services/sports.service';
 
-const URL_PATTERN = /^https?:\/\/\S+$/;
+const HEX_COLOUR = /^#[0-9a-fA-F]{6}$/;
 
 /**
- * Add/Edit Sport dialog laid out as the Figma "Add Sport" screen: name, and an icon row whose
- * square shows the icon on a palette colour (the API stores no colour, so it is not saved).
+ * Add/Edit Sport dialog laid out as the Figma "Add Sport" screen: a name (emoji allowed) and a
+ * hex colour whose swatch updates as you type. The API has no colour field, so only the name is
+ * saved; the table keeps picking the row accent from the design system palette.
  */
 @Component({
   selector: 'app-sport-dialog',
@@ -39,35 +39,32 @@ export class SportDialogComponent implements OnInit {
 
   readonly form = inject(NonNullableFormBuilder).group({
     name: ['', Validators.required],
-    iconUrl: ['', Validators.pattern(URL_PATTERN)],
+    colour: ['', Validators.pattern(HEX_COLOUR)],
   });
   readonly isSaving = signal(false);
   readonly errorMessage = signal('');
-  readonly iconFailed = signal(false);
-  private readonly values = toSignal(this.form.valueChanges, { initialValue: this.form.value });
 
-  /** The icon square fills with a palette colour once a working icon URL is entered. */
-  readonly hasIcon = computed(
-    () => !!this.values().iconUrl && this.form.controls.iconUrl.valid && !this.iconFailed(),
-  );
-  readonly accent = computed(() => {
-    const name = this.values().name ?? '';
-    const hash = [...name].reduce((sum, char) => sum + char.charCodeAt(0), 0);
-    return SPORT_ACCENTS[hash % SPORT_ACCENTS.length];
+  private readonly colourValue = toSignal(this.form.controls.colour.valueChanges, {
+    initialValue: '',
+  });
+  /** The swatch beside the field shows the typed colour once it is a full hex value. */
+  readonly swatch = computed(() => {
+    const colour = this.colourValue();
+    return HEX_COLOUR.test(colour) ? colour : null;
   });
 
   ngOnInit(): void {
     const sport = this.sport();
     if (sport) {
-      this.form.setValue({ name: sport.name, iconUrl: sport.iconUrl ?? '' });
+      this.form.controls.name.setValue(sport.name);
     }
   }
 
-  clear(control: 'name' | 'iconUrl'): void {
+  clear(control: 'name' | 'colour'): void {
     this.form.controls[control].setValue('');
   }
 
-  showError(control: 'name' | 'iconUrl'): boolean {
+  showError(control: 'name' | 'colour'): boolean {
     const field = this.form.controls[control];
     return field.invalid && field.touched;
   }
@@ -77,11 +74,11 @@ export class SportDialogComponent implements OnInit {
     if (this.form.invalid || this.isSaving()) {
       return;
     }
-    const input = toSportInput(this.form.getRawValue());
+    const name = this.form.controls.name.value.trim();
     const sport = this.sport();
     const request = sport
-      ? this.sportsService.update(sport.id, input)
-      : this.sportsService.create(input);
+      ? this.sportsService.update(sport.id, { name })
+      : this.sportsService.create({ name });
 
     this.isSaving.set(true);
     request.pipe(finalize(() => this.isSaving.set(false))).subscribe({
