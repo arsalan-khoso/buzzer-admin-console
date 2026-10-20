@@ -37,33 +37,39 @@
     </div>
 
     <div class="field">
-      <label class="field__label" for="sport-colour">Add Icon and color:</label>
+      <label class="field__label" for="sport-icon">Add Icon:</label>
       <div class="icon-input">
         <label
           class="icon-input__preview"
-          for="sport-colour"
+          for="sport-icon"
           aria-hidden="true"
-          [style.background-color]="swatch()"
+          [style.background-color]="accent()"
         >
-          @if (!swatch()) {
-            <img src="assets/icons/ic_plus.svg" width="16" height="16" alt="" />
+          @if (showsIcon()) {
+            <img
+              [src]="form.controls.iconUrl.value"
+              width="18"
+              height="18"
+              alt=""
+              (error)="iconFailed.set(true)"
+            />
           }
         </label>
         <div class="input-clearable">
           <input
-            id="sport-colour"
+            id="sport-icon"
             class="input"
-            [class.input--invalid]="showError('colour')"
-            formControlName="colour"
-            placeholder="#FFFFFF"
-            maxlength="7"
+            [class.input--invalid]="showError('iconUrl')"
+            formControlName="iconUrl"
+            placeholder="Icon URL"
+            (input)="iconFailed.set(false)"
           />
-          @if (form.controls.colour.value) {
+          @if (form.controls.iconUrl.value) {
             <button
               type="button"
               class="input-clearable__btn"
-              (click)="clear('colour')"
-              aria-label="Clear colour"
+              (click)="clear('iconUrl')"
+              aria-label="Clear icon URL"
             >
               <img
                 src="assets/icons/ic_clear.svg"
@@ -76,9 +82,31 @@
           }
         </div>
       </div>
-      @if (showError('colour')) {
-        <p class="field__error">Enter a hex colour like #2ED368.</p>
+      @if (showError('iconUrl')) {
+        <p class="field__error">Enter a valid URL starting with http:// or https://.</p>
       }
+    </div>
+
+    <div class="field">
+      <label class="field__label" for="sport-description">Add Description:</label>
+      <div class="input-clearable">
+        <input
+          id="sport-description"
+          class="input"
+          formControlName="description"
+          placeholder="Description"
+        />
+        @if (form.controls.description.value) {
+          <button
+            type="button"
+            class="input-clearable__btn"
+            (click)="clear('description')"
+            aria-label="Clear description"
+          >
+            <img src="assets/icons/ic_clear.svg" width="16" height="16" alt="" aria-hidden="true" />
+          </button>
+        }
+      </div>
     </div>
 
     @if (errorMessage()) {
