@@ -9,6 +9,7 @@ export const NAV_GROUPS: NavGroup[] = [
     items: [
       { label: 'Dashboard', route: '/dashboard', icon: 'ic_dashboard' },
       { label: 'Sports', route: '/sports', icon: 'ic_sports', pageTitle: 'Sport Management' },
+      { label: 'Matches', route: '/matches', icon: 'ic_matches' },
     ],
   },
   {

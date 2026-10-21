@@ -1,0 +1,32 @@
+.match-teams {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.match-summary {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface-3);
+
+  &__sport {
+    color: var(--color-text-muted);
+    font-size: var(--font-size-xs);
+  }
+
+  &__teams {
+    font-weight: var(--font-weight-medium);
+  }
+
+  &__vs {
+    color: var(--color-accent);
+  }
+}
+
+// The native picker icon is dark by default and disappears on the dark surface
+input[type='datetime-local'] {
+  color-scheme: dark;
+}
