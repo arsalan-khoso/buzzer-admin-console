@@ -1,0 +1,138 @@
+<div class="dialog-backdrop"></div>
+<section class="dialog" role="dialog" aria-modal="true" aria-labelledby="match-dialog-title">
+  <div class="dialog__header">
+    <h2 id="match-dialog-title" class="dialog__title">
+      {{ isEdit() ? 'Edit Match' : 'Schedule Match' }}
+    </h2>
+    <button type="button" class="dialog__close" (click)="closed.emit()" aria-label="Close">
+      <img src="assets/icons/ic_close.svg" width="20" height="20" alt="" aria-hidden="true" />
+    </button>
+  </div>
+
+  <form class="dialog__form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    @if (match(); as current) {
+      <div class="match-summary">
+        <span class="match-summary__sport">{{ current.sport?.name ?? 'Sport' }}</span>
+        <span class="match-summary__teams">
+          {{ current.homeTeam?.name ?? 'Home' }} <span class="match-summary__vs">vs</span>
+          {{ current.awayTeam?.name ?? 'Away' }}
+        </span>
+      </div>
+    } @else {
+      <div class="field">
+        <label class="field__label" for="match-sport">Sport*:</label>
+        <select
+          id="match-sport"
+          class="input"
+          [class.input--invalid]="showError('sportId')"
+          formControlName="sportId"
+        >
+          <option value="">Select sport</option>
+          @for (sport of sports(); track sport.id) {
+            <option [value]="sport.id">{{ sport.name }}</option>
+          }
+        </select>
+        @if (showError('sportId')) {
+          <p class="field__error">Sport is required.</p>
+        }
+      </div>
+
+      <div class="match-teams">
+        <div class="field">
+          <label class="field__label" for="match-home">Home team*:</label>
+          <select
+            id="match-home"
+            class="input"
+            [class.input--invalid]="showError('homeTeamId') || hasSameTeam()"
+            formControlName="homeTeamId"
+          >
+            <option value="">Select home team</option>
+            @for (team of teams(); track team.id) {
+              <option [value]="team.id">{{ team.name }}</option>
+            }
+          </select>
+          @if (showError('homeTeamId')) {
+            <p class="field__error">Home team is required.</p>
+          }
+        </div>
+
+        <div class="field">
+          <label class="field__label" for="match-away">Away team*:</label>
+          <select
+            id="match-away"
+            class="input"
+            [class.input--invalid]="showError('awayTeamId') || hasSameTeam()"
+            formControlName="awayTeamId"
+          >
+            <option value="">Select away team</option>
+            @for (team of teams(); track team.id) {
+              <option [value]="team.id">{{ team.name }}</option>
+            }
+          </select>
+          @if (showError('awayTeamId')) {
+            <p class="field__error">Away team is required.</p>
+          }
+        </div>
+      </div>
+
+      @if (hasSameTeam()) {
+        <p class="field__error" role="alert">Home and away must be different teams.</p>
+      } @else if (isLoadingTeams()) {
+        <p class="field__hint">Loading teams…</p>
+      } @else if (form.controls.sportId.value && !teams().length) {
+        <p class="field__hint">This sport has no teams yet. Add teams from the Sports page.</p>
+      }
+    }
+
+    <div class="field">
+      <label class="field__label" for="match-date">Date and time*:</label>
+      <input
+        id="match-date"
+        class="input"
+        type="datetime-local"
+        [class.input--invalid]="showError('scheduledAt')"
+        formControlName="scheduledAt"
+      />
+      @if (showError('scheduledAt')) {
+        <p class="field__error">Date and time are required.</p>
+      }
+    </div>
+
+    <div class="field">
+      <label class="field__label" for="match-venue">Venue:</label>
+      <div class="input-clearable">
+        <input
+          id="match-venue"
+          class="input"
+          formControlName="venue"
+          placeholder="Venue (optional)"
+        />
+        @if (form.controls.venue.value) {
+          <button
+            type="button"
+            class="input-clearable__btn"
+            (click)="clearVenue()"
+            aria-label="Clear venue"
+          >
+            <img src="assets/icons/ic_clear.svg" width="16" height="16" alt="" aria-hidden="true" />
+          </button>
+        }
+      </div>
+    </div>
+
+    @if (errorMessage()) {
+      <p class="dialog__error" role="alert">{{ errorMessage() }}</p>
+    }
+
+    <div class="dialog__actions">
+      <button type="button" class="btn" (click)="closed.emit()">Cancel</button>
+      <button
+        type="submit"
+        class="btn btn--primary"
+        [disabled]="isSaving() || (submitted() && form.invalid) || hasSameTeam()"
+      >
+        {{ isEdit() ? 'Save' : 'Schedule' }}
+      </button>
+    </div>
+  </form>
+</section>
