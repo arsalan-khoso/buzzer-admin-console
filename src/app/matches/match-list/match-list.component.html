@@ -1,0 +1,157 @@
+<section class="page">
+  <div class="page__toolbar">
+    <span class="chip">Matches</span>
+    <span class="page__actions">
+      <button type="button" class="btn btn--small" (click)="openSchedule()">
+        <img
+          [src]="iconsPath + '/ic_plus_circle.svg'"
+          width="16"
+          height="16"
+          alt=""
+          aria-hidden="true"
+        />
+        Schedule Match
+      </button>
+    </span>
+  </div>
+
+  <div class="tabs" role="tablist" aria-label="Match status">
+    @for (tab of tabs; track tab.status) {
+      <button
+        type="button"
+        role="tab"
+        class="tabs__tab"
+        [class.tabs__tab--active]="status() === tab.status"
+        [attr.aria-selected]="status() === tab.status"
+        (click)="selectTab(tab.status)"
+      >
+        {{ tab.label }}
+      </button>
+    }
+  </div>
+
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th scope="col">Sport</th>
+          <th scope="col">Home vs Away</th>
+          <th
+            scope="col"
+            class="data-table__sortable"
+            [attr.aria-sort]="sortOrder() === 'asc' ? 'ascending' : 'descending'"
+          >
+            <button type="button" class="data-table__sort" (click)="toggleSort()">
+              Scheduled At
+              <span
+                class="data-table__caret"
+                [class.data-table__caret--up]="sortOrder() === 'asc'"
+              ></span>
+            </button>
+          </th>
+          <th scope="col">Venue</th>
+          <th scope="col">Status</th>
+          <th scope="col">Score</th>
+          <th scope="col" class="data-table__actions">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (match of matches(); track match.id) {
+          <tr>
+            <td>{{ match.sport?.name ?? '—' }}</td>
+            <td>
+              <span class="match-list__teams">
+                {{ match.homeTeam?.name ?? 'Home' }}
+                <span class="match-list__vs">vs</span>
+                {{ match.awayTeam?.name ?? 'Away' }}
+              </span>
+            </td>
+            <td class="match-list__date">{{ match.scheduledAt | date: 'MMM d, y, HH:mm' }}</td>
+            <td [class.data-table__muted]="!match.venue">{{ match.venue || '—' }}</td>
+            <td>
+              <span [class]="'tag ' + statusTags[match.status]">
+                {{ statusLabels[match.status] }}
+              </span>
+            </td>
+            <td class="match-list__score">
+              {{ hasScore(match) ? match.homeScore + ' : ' + match.awayScore : '—' }}
+            </td>
+            <td class="data-table__actions">
+              <button
+                type="button"
+                class="icon-btn"
+                (click)="openEdit(match)"
+                [attr.aria-label]="'Edit ' + matchName(match)"
+              >
+                <img
+                  [src]="iconsPath + '/ic_edit.svg'"
+                  width="18"
+                  height="18"
+                  alt=""
+                  aria-hidden="true"
+                />
+              </button>
+              <button
+                type="button"
+                class="icon-btn"
+                (click)="askDelete(match)"
+                [attr.aria-label]="'Delete ' + matchName(match)"
+              >
+                <img
+                  [src]="iconsPath + '/ic_delete.svg'"
+                  width="18"
+                  height="18"
+                  alt=""
+                  aria-hidden="true"
+                />
+              </button>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td class="data-table__empty" colspan="7">
+              {{ isLoading() ? 'Loading matches…' : errorMessage() || 'No matches found.' }}
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  @if (totalPages() > 1) {
+    <nav class="pagination" aria-label="Pagination">
+      <button
+        type="button"
+        class="btn btn--small"
+        [disabled]="page() === 1"
+        (click)="goToPage(page() - 1)"
+      >
+        Previous
+      </button>
+      <span class="pagination__info">Page {{ page() }} of {{ totalPages() }}</span>
+      <button
+        type="button"
+        class="btn btn--small"
+        [disabled]="page() >= totalPages()"
+        (click)="goToPage(page() + 1)"
+      >
+        Next
+      </button>
+    </nav>
+  }
+</section>
+
+@if (isFormOpen()) {
+  <app-match-dialog [match]="editingMatch()" (saved)="onSaved()" (closed)="closeForm()" />
+}
+
+@if (deletingMatch(); as match) {
+  <app-confirm-dialog
+    title="Delete Match"
+    [message]="'Delete ' + matchName(match) + '? It will be removed from every list.'"
+    [isBusy]="isDeleting()"
+    [errorMessage]="deleteError()"
+    (confirmed)="confirmDelete()"
+    (cancelled)="deletingMatch.set(null)"
+  />
+}

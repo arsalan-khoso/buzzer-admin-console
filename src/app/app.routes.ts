@@ -2,8 +2,11 @@ import { Routes } from '@angular/router';
 import { authGuard, guestGuard } from './core/auth/guards/auth.guard';
 import { NAV_GROUPS } from './common/constants/navigation.constants';
 
+/** Sections with their own pages; every other sidebar link shows the placeholder. */
+const BUILT_SECTIONS = ['/sports', '/matches'];
+
 const sectionRoutes: Routes = NAV_GROUPS.flatMap((group) => group.items)
-  .filter((item) => item.route !== '/sports')
+  .filter((item) => !BUILT_SECTIONS.includes(item.route))
   .map((item) => ({
     path: item.route.slice(1),
     title: item.pageTitle ?? item.label,
@@ -32,6 +35,10 @@ export const routes: Routes = [
       {
         path: 'sports',
         loadChildren: () => import('./sports/sports.routes').then((m) => m.SPORTS_ROUTES),
+      },
+      {
+        path: 'matches',
+        loadChildren: () => import('./matches/matches.routes').then((m) => m.MATCHES_ROUTES),
       },
       ...sectionRoutes,
     ],
