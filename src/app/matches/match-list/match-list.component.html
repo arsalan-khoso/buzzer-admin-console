@@ -57,7 +57,13 @@
       </thead>
       <tbody>
         @for (match of matches(); track match.id) {
-          <tr>
+          <tr
+            class="data-table__row--link"
+            tabindex="0"
+            [attr.aria-label]="'Open ' + matchName(match)"
+            (click)="openMatch(match)"
+            (keydown.enter)="openMatch(match)"
+          >
             <td>{{ match.sport?.name ?? '—' }}</td>
             <td>
               <span class="match-list__teams">
@@ -76,7 +82,11 @@
             <td class="match-list__score">
               {{ hasScore(match) ? match.homeScore + ' : ' + match.awayScore : '—' }}
             </td>
-            <td class="data-table__actions">
+            <td
+              class="data-table__actions"
+              (click)="$event.stopPropagation()"
+              (keydown.enter)="$event.stopPropagation()"
+            >
               <button
                 type="button"
                 class="icon-btn"

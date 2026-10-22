@@ -153,6 +153,14 @@ export class MatchListComponent {
     return match.status === 'LIVE' || match.status === 'FINISHED' || match.startedAt !== null;
   }
 
+  /** The tab and page go along, so the detail page's breadcrumb returns to the same view. */
+  openMatch(match: Match): void {
+    void this.router.navigate([match.id], {
+      relativeTo: this.route,
+      queryParamsHandling: 'preserve',
+    });
+  }
+
   openSchedule(): void {
     this.editingMatch.set(null);
     this.isFormOpen.set(true);

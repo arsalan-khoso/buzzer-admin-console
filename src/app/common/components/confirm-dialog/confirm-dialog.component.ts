@@ -10,6 +10,7 @@ export class ConfirmDialogComponent {
   readonly title = input.required<string>();
   readonly message = input.required<string>();
   readonly confirmLabel = input('Delete');
+  readonly cancelLabel = input('Cancel');
   readonly isBusy = input(false);
   readonly errorMessage = input('');
 

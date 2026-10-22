@@ -1,0 +1,152 @@
+<section class="page">
+  <app-breadcrumb [items]="breadcrumb()" />
+
+  @if (match(); as match) {
+    <header class="match-card">
+      <div class="match-card__head">
+        <span class="match-card__sport">{{ match.sport?.name ?? '—' }}</span>
+        <span [class]="'tag ' + statusTags[match.status]">{{ statusLabels[match.status] }}</span>
+      </div>
+
+      <div class="match-card__board">
+        <span class="match-card__team">{{ match.homeTeam?.name ?? 'Home' }}</span>
+        <span class="match-card__score" aria-label="Score">
+          @if (scoreboard(); as board) {
+            {{ board.home.score }} : {{ board.away.score }}
+          } @else {
+            {{ match.homeScore }} : {{ match.awayScore }}
+          }
+        </span>
+        <span class="match-card__team match-card__team--away">
+          {{ match.awayTeam?.name ?? 'Away' }}
+        </span>
+      </div>
+
+      <dl class="match-card__meta">
+        <div class="match-card__row">
+          <dt>Venue:</dt>
+          <dd>{{ match.venue || '—' }}</dd>
+        </div>
+        <div class="match-card__row">
+          <dt>Scheduled:</dt>
+          <dd>{{ match.scheduledAt | date: "MMM d, y. 'at' HH:mm" }}</dd>
+        </div>
+        @if (match.status === 'LIVE' || match.status === 'FINISHED') {
+          <div class="match-card__row">
+            <dt>Started:</dt>
+            <dd>{{ match.startedAt ? (match.startedAt | date: "MMM d, y. 'at' HH:mm") : '—' }}</dd>
+          </div>
+        }
+        @if (match.status === 'FINISHED') {
+          <div class="match-card__row">
+            <dt>Finished:</dt>
+            <dd>
+              {{ match.finishedAt ? (match.finishedAt | date: "MMM d, y. 'at' HH:mm") : '—' }}
+            </dd>
+          </div>
+        }
+      </dl>
+
+      <div class="match-card__actions">
+        @for (action of actions(); track action.status) {
+          <button
+            type="button"
+            class="btn btn--small"
+            [class.btn--primary]="action.status === 'LIVE'"
+            [disabled]="isChanging()"
+            (click)="runAction(action)"
+          >
+            {{ action.label }}
+          </button>
+        } @empty {
+          <span class="match-card__final">
+            {{ statusLabels[match.status] }} is a final status, so it cannot change.
+          </span>
+        }
+      </div>
+      @if (statusError() && !pendingAction()) {
+        <p class="dialog__error" role="alert">{{ statusError() }}</p>
+      }
+    </header>
+
+    <div class="section-header">
+      <h3>Timeline</h3>
+    </div>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th scope="col">Minute</th>
+            <th scope="col">Type</th>
+            <th scope="col">Team</th>
+            <th scope="col">Player</th>
+            <th scope="col">Detail</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (event of timeline(); track event.id) {
+            <tr>
+              <td class="match-detail__minute">{{ event.minute }}'</td>
+              <td>{{ eventLabels[event.type] ?? event.type }}</td>
+              <td [class.data-table__muted]="!event.team">{{ event.team?.name ?? '—' }}</td>
+              <td [class.data-table__muted]="!event.player">{{ playerName(event) }}</td>
+              <td [class.data-table__muted]="!event.detail">{{ event.detail || '—' }}</td>
+            </tr>
+          } @empty {
+            <tr>
+              <td class="data-table__empty" colspan="5">No events yet.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section-header">
+      <h3>Stats</h3>
+      <span class="match-detail__total">{{ stats()?.totalEvents ?? 0 }} events in total</span>
+    </div>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th scope="col">Event</th>
+            <th scope="col">{{ stats()?.home?.team ?? match.homeTeam?.name ?? 'Home' }}</th>
+            <th scope="col">{{ stats()?.away?.team ?? match.awayTeam?.name ?? 'Away' }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of statsRows(); track row.type) {
+            <tr>
+              <td>{{ eventLabels[row.type] }}</td>
+              <td class="match-detail__count">{{ row.home }}</td>
+              <td class="match-detail__count">{{ row.away }}</td>
+            </tr>
+          } @empty {
+            <tr>
+              <td class="data-table__empty" colspan="3">No team events yet.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  } @else {
+    <p [class]="errorMessage() ? 'dialog__error' : 'data-table__muted'" role="status">
+      {{ isLoading() ? 'Loading match…' : errorMessage() }}
+    </p>
+  }
+</section>
+
+@if (pendingAction(); as action) {
+  @if (match(); as match) {
+    <app-confirm-dialog
+      [title]="action.label"
+      [message]="confirmMessage(action, match)"
+      [confirmLabel]="action.label"
+      cancelLabel="Go Back"
+      [isBusy]="isChanging()"
+      [errorMessage]="statusError()"
+      (confirmed)="confirmAction()"
+      (cancelled)="cancelAction()"
+    />
+  }
+}

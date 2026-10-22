@@ -7,7 +7,15 @@ import { ApiResponse, ListQuery, Page } from '../../core/models/api.model';
 import { SPORTS_ENDPOINTS } from '../../sports/constants/sports.constants';
 import { Team } from '../../sports/models/hierarchy.model';
 import { MATCHES_ENDPOINT, MATCH_DIALOG_OPTIONS_LIMIT } from '../constants/matches.constants';
-import { CreateMatchInput, Match, MatchStatus, UpdateMatchInput } from '../models/match.model';
+import {
+  CreateMatchInput,
+  Match,
+  MatchEvent,
+  MatchScoreboard,
+  MatchStats,
+  MatchStatus,
+  UpdateMatchInput,
+} from '../models/match.model';
 
 export interface MatchListQuery extends ListQuery {
   status?: MatchStatus | '';
@@ -44,6 +52,38 @@ export class MatchesService {
   update(id: string, input: UpdateMatchInput): Observable<Match> {
     return this.http
       .patch<ApiResponse<Match>>(this.url(`${MATCHES_ENDPOINT}/${id}`), input)
+      .pipe(map((response) => response.data));
+  }
+
+  get(id: string): Observable<Match> {
+    return this.http
+      .get<ApiResponse<Match>>(this.url(`${MATCHES_ENDPOINT}/${id}`))
+      .pipe(map((response) => response.data));
+  }
+
+  /** The backend rejects a move its status rules do not allow with a 400. */
+  changeStatus(id: string, status: MatchStatus): Observable<Match> {
+    return this.http
+      .patch<ApiResponse<Match>>(this.url(`${MATCHES_ENDPOINT}/${id}/status`), { status })
+      .pipe(map((response) => response.data));
+  }
+
+  /** Events come back already in match order. */
+  timeline(id: string): Observable<MatchEvent[]> {
+    return this.http
+      .get<ApiResponse<MatchEvent[]>>(this.url(`${MATCHES_ENDPOINT}/${id}/timeline`))
+      .pipe(map((response) => response.data));
+  }
+
+  stats(id: string): Observable<MatchStats> {
+    return this.http
+      .get<ApiResponse<MatchStats>>(this.url(`${MATCHES_ENDPOINT}/${id}/stats`))
+      .pipe(map((response) => response.data));
+  }
+
+  scoreboard(id: string): Observable<MatchScoreboard> {
+    return this.http
+      .get<ApiResponse<MatchScoreboard>>(this.url(`${MATCHES_ENDPOINT}/${id}/scoreboard`))
       .pipe(map((response) => response.data));
   }
 
