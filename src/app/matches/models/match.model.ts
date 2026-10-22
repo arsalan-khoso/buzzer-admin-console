@@ -39,3 +39,60 @@ export interface MatchStatusTab {
   label: string;
   status: MatchStatus | '';
 }
+
+export type MatchEventType =
+  | 'GOAL'
+  | 'FOUL'
+  | 'SUBSTITUTION'
+  | 'YELLOW_CARD'
+  | 'RED_CARD'
+  | 'TIMEOUT'
+  | 'PENALTY'
+  | 'INJURY'
+  | 'OTHER';
+
+export interface MatchPlayer {
+  id: string;
+  firstName: string;
+  lastName: string;
+  jerseyNumber: number | null;
+}
+
+/** One timeline entry; `team` and `player` are null when the event names none. */
+export interface MatchEvent {
+  id: string;
+  matchId: string;
+  type: MatchEventType;
+  minute: number;
+  teamId: string | null;
+  playerId: string | null;
+  detail: string | null;
+  team: Team | null;
+  player: MatchPlayer | null;
+}
+
+export interface TeamEventCounts {
+  team: string;
+  events: Partial<Record<MatchEventType, number>>;
+}
+
+export interface MatchStats {
+  matchId: string;
+  totalEvents: number;
+  home: TeamEventCounts;
+  away: TeamEventCounts;
+}
+
+export interface MatchScoreboard {
+  matchId: string;
+  status: MatchStatus;
+  home: { team: string; score: number };
+  away: { team: string; score: number };
+}
+
+/** A status button on the detail page; `confirm` asks before the change is sent. */
+export interface MatchStatusAction {
+  status: MatchStatus;
+  label: string;
+  confirm: boolean;
+}

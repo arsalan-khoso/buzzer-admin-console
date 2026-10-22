@@ -1,4 +1,9 @@
-import { MatchStatus, MatchStatusTab } from '../models/match.model';
+import {
+  MatchEventType,
+  MatchStatus,
+  MatchStatusAction,
+  MatchStatusTab,
+} from '../models/match.model';
 
 export const MATCHES_ENDPOINT = 'matches';
 
@@ -28,4 +33,46 @@ export const MATCH_STATUS_TAGS: Record<MatchStatus, string> = {
   LIVE: 'tag--success',
   FINISHED: '',
   CANCELLED: 'tag--danger',
+};
+
+/**
+ * The backend's status rules: SCHEDULED can go LIVE or CANCELLED, LIVE can go FINISHED or
+ * CANCELLED, FINISHED and CANCELLED are final. Any other move returns 400.
+ */
+export const MATCH_STATUS_ACTIONS: Record<MatchStatus, MatchStatusAction[]> = {
+  SCHEDULED: [
+    { status: 'LIVE', label: 'Start Match', confirm: false },
+    { status: 'CANCELLED', label: 'Cancel Match', confirm: true },
+  ],
+  LIVE: [
+    { status: 'FINISHED', label: 'Finish Match', confirm: true },
+    { status: 'CANCELLED', label: 'Cancel Match', confirm: true },
+  ],
+  FINISHED: [],
+  CANCELLED: [],
+};
+
+/** Order of the rows in the Stats section. */
+export const MATCH_EVENT_TYPES: MatchEventType[] = [
+  'GOAL',
+  'PENALTY',
+  'FOUL',
+  'YELLOW_CARD',
+  'RED_CARD',
+  'SUBSTITUTION',
+  'TIMEOUT',
+  'INJURY',
+  'OTHER',
+];
+
+export const MATCH_EVENT_LABELS: Record<MatchEventType, string> = {
+  GOAL: 'Goal',
+  FOUL: 'Foul',
+  SUBSTITUTION: 'Substitution',
+  YELLOW_CARD: 'Yellow Card',
+  RED_CARD: 'Red Card',
+  TIMEOUT: 'Timeout',
+  PENALTY: 'Penalty',
+  INJURY: 'Injury',
+  OTHER: 'Other',
 };

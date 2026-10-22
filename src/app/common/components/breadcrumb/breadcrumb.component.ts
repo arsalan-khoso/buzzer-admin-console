@@ -5,6 +5,8 @@ export interface BreadcrumbItem {
   label: string;
   /** Router link; the last item (current page) has none. */
   link?: string[];
+  /** Query params for the link, e.g. a list's tab and page. */
+  queryParams?: Record<string, string | null>;
 }
 
 @Component({
@@ -14,7 +16,9 @@ export interface BreadcrumbItem {
     <nav class="breadcrumb" aria-label="Breadcrumb">
       @for (item of items(); track $index; let last = $last) {
         @if (item.link && !last) {
-          <a class="breadcrumb__item" [routerLink]="item.link">{{ item.label }}</a>
+          <a class="breadcrumb__item" [routerLink]="item.link" [queryParams]="item.queryParams">{{
+            item.label
+          }}</a>
         } @else {
           <span class="breadcrumb__item breadcrumb__item--current" aria-current="page">
             {{ item.label }}
