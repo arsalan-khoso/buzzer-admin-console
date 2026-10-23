@@ -22,6 +22,7 @@ import { MatchesService } from '../../services/matches.service';
 import {
   differentTeamsValidator,
   fromDateTimeInput,
+  futureDateValidator,
   toDateTimeInput,
 } from '../../utils/match-form.util';
 
@@ -51,7 +52,7 @@ export class MatchDialogComponent implements OnInit {
       sportId: ['', Validators.required],
       homeTeamId: ['', Validators.required],
       awayTeamId: ['', Validators.required],
-      scheduledAt: ['', Validators.required],
+      scheduledAt: ['', [Validators.required, futureDateValidator()]],
       venue: [''],
     },
     { validators: differentTeamsValidator },
@@ -73,6 +74,8 @@ export class MatchDialogComponent implements OnInit {
   readonly teams = signal<Team[]>([]);
   readonly isLoadingTeams = signal(false);
   readonly isEdit = computed(() => this.match() !== null);
+  /** Earliest pickable time for a new match; the picker greys out the past. */
+  readonly minScheduledAt = toDateTimeInput(new Date().toISOString());
 
   constructor() {
     // Teams depend on the sport: a new sport clears both picks and loads its teams
@@ -100,6 +103,8 @@ export class MatchDialogComponent implements OnInit {
       this.form.controls.sportId.disable({ emitEvent: false });
       this.form.controls.homeTeamId.disable();
       this.form.controls.awayTeamId.disable();
+      // An existing match may already lie in the past; only a new one must be ahead
+      this.form.controls.scheduledAt.setValidators(Validators.required);
       this.form.patchValue({
         scheduledAt: toDateTimeInput(match.scheduledAt),
         venue: match.venue ?? '',

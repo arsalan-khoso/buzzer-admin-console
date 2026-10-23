@@ -16,6 +16,11 @@ export interface MatchStatsRow {
   away: number;
 }
 
+/** A score exists once the match has started; before that it is shown as a dash or "vs". */
+export function hasScore(match: Pick<Match, 'status' | 'startedAt'>): boolean {
+  return match.status === 'LIVE' || match.status === 'FINISHED' || match.startedAt !== null;
+}
+
 /** The status buttons for a match: only the moves the backend accepts from `status`. */
 export function statusActions(status: MatchStatus): MatchStatusAction[] {
   return MATCH_STATUS_ACTIONS[status] ?? [];
