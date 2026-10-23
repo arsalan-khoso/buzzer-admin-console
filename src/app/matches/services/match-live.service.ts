@@ -24,7 +24,14 @@ export class MatchLiveService {
       });
 
       // (Re)joining on every connect keeps the room after a dropped connection
-      socket.on('connect', () => socket.emit(MATCH_SOCKET_EVENTS.join, matchId));
+      let connectedBefore = false;
+      socket.on('connect', () => {
+        socket.emit(MATCH_SOCKET_EVENTS.join, matchId);
+        if (connectedBefore) {
+          subscriber.next({ kind: 'reconnected' });
+        }
+        connectedBefore = true;
+      });
 
       // An expired token is refused at the handshake; renew it once and connect again
       socket.on('connect_error', () => {
