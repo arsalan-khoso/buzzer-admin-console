@@ -91,10 +91,17 @@
         class="input"
         type="datetime-local"
         [class.input--invalid]="showError('scheduledAt')"
+        [attr.min]="isEdit() ? null : minScheduledAt"
         formControlName="scheduledAt"
       />
       @if (showError('scheduledAt')) {
-        <p class="field__error">Date and time are required.</p>
+        <p class="field__error">
+          {{
+            form.controls.scheduledAt.hasError('pastDate')
+              ? 'Pick a date and time in the future.'
+              : 'Date and time are required.'
+          }}
+        </p>
       }
     </div>
 

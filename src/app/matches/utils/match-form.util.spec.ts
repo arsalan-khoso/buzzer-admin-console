@@ -1,5 +1,10 @@
 import { FormControl, FormGroup } from '@angular/forms';
-import { differentTeamsValidator, fromDateTimeInput, toDateTimeInput } from './match-form.util';
+import {
+  differentTeamsValidator,
+  fromDateTimeInput,
+  futureDateValidator,
+  toDateTimeInput,
+} from './match-form.util';
 
 function teamsForm(home: string, away: string): FormGroup {
   return new FormGroup(
@@ -30,5 +35,14 @@ describe('match form utils', () => {
 
   it('should leave the input empty for an invalid date', () => {
     expect(toDateTimeInput('not a date')).toBe('');
+  });
+
+  it('should accept only a date and time later than now for a new match', () => {
+    const now = () => new Date(2026, 9, 23, 12, 0).getTime();
+    const check = (value: string) => futureDateValidator(now)(new FormControl(value));
+    expect(check('2026-10-23T12:30')).toBeNull();
+    expect(check('2026-10-23T11:59')).toEqual({ pastDate: true });
+    expect(check('2026-10-23T12:00')).toEqual({ pastDate: true });
+    expect(check('')).toBeNull();
   });
 });
