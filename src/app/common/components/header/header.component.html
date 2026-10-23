@@ -13,8 +13,8 @@
     <input
       class="header__search-field"
       type="search"
-      placeholder="Search"
-      aria-label="Search"
+      [placeholder]="searchPlaceholder()"
+      [attr.aria-label]="searchPlaceholder()"
       [value]="searchQuery()"
       (input)="onSearch($event)"
     />

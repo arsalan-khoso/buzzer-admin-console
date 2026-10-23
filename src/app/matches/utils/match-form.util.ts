@@ -26,3 +26,15 @@ export function toDateTimeInput(iso: string): string {
 export function fromDateTimeInput(value: string): string {
   return new Date(value).toISOString();
 }
+
+/** A new match is scheduled ahead: the picked date and time must be later than now. */
+export function futureDateValidator(now: () => number = Date.now): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const value = control.value as string;
+    if (!value) {
+      return null;
+    }
+    const time = new Date(value).getTime();
+    return Number.isNaN(time) || time > now() ? null : { pastDate: true };
+  };
+}

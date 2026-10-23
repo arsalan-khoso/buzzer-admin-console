@@ -2,6 +2,7 @@ import { DatePipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   computed,
   effect,
   inject,
@@ -25,6 +26,7 @@ import {
 } from '../constants/matches.constants';
 import { Match, MatchStatus } from '../models/match.model';
 import { MatchesService } from '../services/matches.service';
+import { hasScore } from '../utils/match-detail.util';
 
 interface ListState {
   matches: Match[];
@@ -44,7 +46,8 @@ const LOADING_STATE: ListState = { matches: [], totalPages: 1, isLoading: true, 
 })
 export class MatchListComponent {
   private readonly matchesService = inject(MatchesService);
-  private readonly search = inject(LayoutService).searchQuery;
+  private readonly layout = inject(LayoutService);
+  private readonly search = this.layout.searchQuery;
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
 
@@ -120,6 +123,10 @@ export class MatchListComponent {
   readonly deleteError = signal('');
 
   constructor() {
+    // The backend matches the search against the venue only
+    this.layout.setSearchPlaceholder('Search by venue');
+    inject(DestroyRef).onDestroy(() => this.layout.setSearchPlaceholder(null));
+
     // A new search always starts from the first page
     toObservable(this.search)
       .pipe(skip(1), takeUntilDestroyed())
@@ -148,9 +155,9 @@ export class MatchListComponent {
     this.setQuery({ page: null });
   }
 
-  /** A score exists once the match has started; before that the column shows a dash. */
+  /** Before kick-off the score column shows a dash. */
   hasScore(match: Match): boolean {
-    return match.status === 'LIVE' || match.status === 'FINISHED' || match.startedAt !== null;
+    return hasScore(match);
   }
 
   /** The tab and page go along, so the detail page's breadcrumb returns to the same view. */

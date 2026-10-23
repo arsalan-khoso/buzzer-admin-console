@@ -10,13 +10,17 @@
 
       <div class="match-card__board">
         <span class="match-card__team">{{ match.homeTeam?.name ?? 'Home' }}</span>
-        <span class="match-card__score" aria-label="Score">
-          @if (scoreboard(); as board) {
-            {{ board.home.score }} : {{ board.away.score }}
-          } @else {
-            {{ match.homeScore }} : {{ match.awayScore }}
-          }
-        </span>
+        @if (hasScore(match)) {
+          <span class="match-card__score" aria-label="Score">
+            @if (scoreboard(); as board) {
+              {{ board.home.score }} : {{ board.away.score }}
+            } @else {
+              {{ match.homeScore }} : {{ match.awayScore }}
+            }
+          </span>
+        } @else {
+          <span class="match-card__score match-card__score--vs" aria-label="Not started">vs</span>
+        }
         <span class="match-card__team match-card__team--away">
           {{ match.awayTeam?.name ?? 'Away' }}
         </span>
@@ -31,7 +35,7 @@
           <dt>Scheduled:</dt>
           <dd>{{ match.scheduledAt | date: "MMM d, y. 'at' HH:mm" }}</dd>
         </div>
-        @if (match.status === 'LIVE' || match.status === 'FINISHED') {
+        @if (showStarted(match)) {
           <div class="match-card__row">
             <dt>Started:</dt>
             <dd>{{ match.startedAt ? (match.startedAt | date: "MMM d, y. 'at' HH:mm") : '—' }}</dd>

@@ -18,6 +18,7 @@ export class HeaderComponent {
   private readonly layout = inject(LayoutService);
 
   readonly searchQuery = this.layout.searchQuery;
+  readonly searchPlaceholder = this.layout.searchPlaceholder;
 
   readonly title = toSignal(
     this.router.events.pipe(

@@ -35,6 +35,7 @@ import {
 import { MatchLiveService } from '../services/match-live.service';
 import { MatchesService } from '../services/matches.service';
 import {
+  hasScore,
   mergeTimeline,
   nameEvent,
   statsRows,
@@ -212,6 +213,16 @@ export class MatchDetailComponent {
   cancelAction(): void {
     this.pendingAction.set(null);
     this.statusError.set('');
+  }
+
+  /** Before kick-off the score box shows "vs", like the dash in the list. */
+  hasScore(match: Match): boolean {
+    return hasScore(match);
+  }
+
+  /** LIVE and FINISHED show when the match started, and so does a match cancelled mid-game. */
+  showStarted(match: Match): boolean {
+    return hasScore(match);
   }
 
   matchName(match: Match): string {
