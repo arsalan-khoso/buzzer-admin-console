@@ -109,4 +109,6 @@ export interface CreateMatchEventInput {
 export type MatchLiveMessage =
   | { kind: 'event'; event: MatchEvent }
   | { kind: 'scoreboard'; scoreboard: MatchScoreboard }
-  | { kind: 'status'; status: MatchStatus };
+  | { kind: 'status'; status: MatchStatus }
+  /** The connection dropped and came back; anything pushed in between was missed. */
+  | { kind: 'reconnected' };

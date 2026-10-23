@@ -114,10 +114,19 @@ export class MatchDetailComponent {
   private readonly liveStatus = signal<MatchStatus | null>(null);
   private readonly liveScoreboard = signal<MatchScoreboard | null>(null);
   private readonly liveEvents = signal<MatchEvent[]>([]);
-  /** Live events the loaded timeline does not have yet. */
+  /**
+   * Live events the loaded timeline does not have yet, named from the loaded teams and players.
+   * They are kept even when they arrive before the page has loaded, so none is lost.
+   */
   private readonly newEvents = computed(() => {
+    const match = this.state()?.match;
+    if (!match) {
+      return [];
+    }
     const loaded = new Set((this.state()?.timeline ?? []).map((event) => event.id));
-    return this.liveEvents().filter((event) => !loaded.has(event.id));
+    return this.liveEvents()
+      .filter((event) => !loaded.has(event.id))
+      .map((event) => nameEvent(event, match, this.players()));
   });
 
   readonly match = computed(() => {
@@ -252,6 +261,10 @@ export class MatchDetailComponent {
       case 'scoreboard':
         this.liveScoreboard.set(message.scoreboard);
         break;
+      case 'reconnected':
+        // Catch up on whatever happened while the connection was down
+        this.reload();
+        break;
       case 'status':
         // Show the new status at once, then load the start and finish times that come with it
         if (message.status !== this.match()?.status) {
@@ -264,11 +277,9 @@ export class MatchDetailComponent {
   }
 
   private addLiveEvent(event: MatchEvent): void {
-    const match = this.state()?.match;
-    if (!match || this.liveEvents().some((known) => known.id === event.id)) {
-      return;
+    if (!this.liveEvents().some((known) => known.id === event.id)) {
+      this.liveEvents.update((events) => [...events, event]);
     }
-    this.liveEvents.update((events) => [...events, nameEvent(event, match, this.players())]);
   }
 
   private loadPlayers(match: Match): Observable<Participant[]> {
