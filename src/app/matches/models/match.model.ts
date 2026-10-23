@@ -96,3 +96,17 @@ export interface MatchStatusAction {
   label: string;
   confirm: boolean;
 }
+
+export interface CreateMatchEventInput {
+  type: MatchEventType;
+  minute: number;
+  teamId?: string;
+  playerId?: string;
+  detail?: string;
+}
+
+/** What the match room pushes over Socket.IO. */
+export type MatchLiveMessage =
+  | { kind: 'event'; event: MatchEvent }
+  | { kind: 'scoreboard'; scoreboard: MatchScoreboard }
+  | { kind: 'status'; status: MatchStatus };

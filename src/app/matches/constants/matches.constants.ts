@@ -52,7 +52,7 @@ export const MATCH_STATUS_ACTIONS: Record<MatchStatus, MatchStatusAction[]> = {
   CANCELLED: [],
 };
 
-/** Order of the rows in the Stats section. */
+/** Event types, in the order the Add Event form and the Stats section list them. */
 export const MATCH_EVENT_TYPES: MatchEventType[] = [
   'GOAL',
   'PENALTY',
@@ -76,3 +76,12 @@ export const MATCH_EVENT_LABELS: Record<MatchEventType, string> = {
   INJURY: 'Injury',
   OTHER: 'Other',
 };
+
+/** Socket.IO event names of the match room. */
+export const MATCH_SOCKET_EVENTS = {
+  join: 'match:join',
+  leave: 'match:leave',
+  event: 'match:event',
+  scoreboard: 'match:scoreboard',
+  status: 'match:status',
+} as const;
