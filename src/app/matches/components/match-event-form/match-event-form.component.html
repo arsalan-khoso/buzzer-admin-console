@@ -1,0 +1,92 @@
+<form class="event-form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+  <div class="event-form__grid">
+    <div class="field">
+      <label class="field__label" for="event-type">Type*:</label>
+      <select
+        id="event-type"
+        class="input"
+        [class.input--invalid]="showError('type')"
+        formControlName="type"
+      >
+        <option value="">Select type</option>
+        @for (type of types; track type) {
+          <option [value]="type">{{ labels[type] }}</option>
+        }
+      </select>
+      @if (showError('type')) {
+        <p class="field__error">Type is required.</p>
+      }
+    </div>
+
+    <div class="field">
+      <label class="field__label" for="event-minute">Minute*:</label>
+      <input
+        id="event-minute"
+        class="input"
+        inputmode="numeric"
+        placeholder="e.g. 45"
+        [class.input--invalid]="showError('minute')"
+        formControlName="minute"
+      />
+      @if (showError('minute')) {
+        <p class="field__error">Enter a whole minute, 0 or more.</p>
+      }
+    </div>
+
+    <div class="field">
+      <label class="field__label" for="event-team">
+        Team{{ form.controls.type.value === 'GOAL' ? '*' : '' }}:
+      </label>
+      <select
+        id="event-team"
+        class="input"
+        [class.input--invalid]="showTeamError()"
+        formControlName="teamId"
+      >
+        <option value="">No team</option>
+        <option [value]="match().homeTeamId">{{ match().homeTeam?.name ?? 'Home' }}</option>
+        <option [value]="match().awayTeamId">{{ match().awayTeam?.name ?? 'Away' }}</option>
+      </select>
+      @if (showTeamError()) {
+        <p class="field__error">Pick the team that scored, so the score updates.</p>
+      }
+    </div>
+
+    <div class="field">
+      <label class="field__label" for="event-player">Player:</label>
+      <select id="event-player" class="input" formControlName="playerId">
+        <option value="">{{ playerPlaceholder() }}</option>
+        @for (player of teamPlayers(); track player.id) {
+          <option [value]="player.id">
+            {{ player.jerseyNumber !== null ? '#' + player.jerseyNumber : '' }}
+            {{ player.firstName }} {{ player.lastName }}
+          </option>
+        }
+      </select>
+    </div>
+  </div>
+
+  <div class="field">
+    <label class="field__label" for="event-detail">Detail:</label>
+    <input
+      id="event-detail"
+      class="input"
+      formControlName="detail"
+      placeholder="Optional note, e.g. header from a corner"
+    />
+  </div>
+
+  @if (errorMessage()) {
+    <p class="dialog__error" role="alert">{{ errorMessage() }}</p>
+  }
+
+  <div class="event-form__actions">
+    <button
+      type="submit"
+      class="btn btn--small btn--primary"
+      [disabled]="isSaving() || (submitted() && form.invalid)"
+    >
+      {{ isSaving() ? 'Adding…' : 'Add Event' }}
+    </button>
+  </div>
+</form>

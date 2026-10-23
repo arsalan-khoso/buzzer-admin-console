@@ -69,6 +69,17 @@
       }
     </header>
 
+    @if (isLive()) {
+      <section class="match-detail__events" aria-labelledby="add-event-title">
+        <h3 id="add-event-title" class="match-detail__events-title">Add Event</h3>
+        <app-match-event-form
+          [match]="match"
+          [players]="players()"
+          (added)="onEventAdded($event)"
+        />
+      </section>
+    }
+
     <div class="section-header">
       <h3>Timeline</h3>
     </div>
@@ -103,7 +114,10 @@
 
     <div class="section-header">
       <h3>Stats</h3>
-      <span class="match-detail__total">{{ stats()?.totalEvents ?? 0 }} events in total</span>
+      <span class="match-detail__total">
+        {{ stats()?.totalEvents ?? 0 }} {{ stats()?.totalEvents === 1 ? 'event' : 'events' }} in
+        total
+      </span>
     </div>
     <div class="table-wrap">
       <table class="data-table">

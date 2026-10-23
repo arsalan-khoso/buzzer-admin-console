@@ -5,9 +5,10 @@ import { toHttpParams } from '../../common/utils/http-params.util';
 import { API_BASE_URL, apiUrl } from '../../core/api.config';
 import { ApiResponse, ListQuery, Page } from '../../core/models/api.model';
 import { SPORTS_ENDPOINTS } from '../../sports/constants/sports.constants';
-import { Team } from '../../sports/models/hierarchy.model';
+import { Participant, Team } from '../../sports/models/hierarchy.model';
 import { MATCHES_ENDPOINT, MATCH_DIALOG_OPTIONS_LIMIT } from '../constants/matches.constants';
 import {
+  CreateMatchEventInput,
   CreateMatchInput,
   Match,
   MatchEvent,
@@ -78,6 +79,21 @@ export class MatchesService {
   stats(id: string): Observable<MatchStats> {
     return this.http
       .get<ApiResponse<MatchStats>>(this.url(`${MATCHES_ENDPOINT}/${id}/stats`))
+      .pipe(map((response) => response.data));
+  }
+
+  /** The backend accepts events only while the match is LIVE (400 otherwise). */
+  addEvent(id: string, input: CreateMatchEventInput): Observable<MatchEvent> {
+    return this.http
+      .post<ApiResponse<MatchEvent>>(this.url(`${MATCHES_ENDPOINT}/${id}/events`), input)
+      .pipe(map((response) => response.data));
+  }
+
+  playersForTeam(teamId: string): Observable<Participant[]> {
+    return this.http
+      .get<ApiResponse<Participant[]>>(this.url(SPORTS_ENDPOINTS.participants), {
+        params: toHttpParams({ teamId, limit: MATCH_DIALOG_OPTIONS_LIMIT }),
+      })
       .pipe(map((response) => response.data));
   }
 
