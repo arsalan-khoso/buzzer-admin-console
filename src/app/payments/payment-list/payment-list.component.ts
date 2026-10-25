@@ -30,7 +30,6 @@ import {
   PAYMENT_CURRENCIES,
   PAYMENT_STATUSES,
   PAYMENT_STATUS_LABELS,
-  PAYMENT_STATUS_ROLES,
   PAYMENT_STATUS_TABS,
   PAYMENT_STATUS_TAGS,
   TRANSACTIONS_PAGE_SIZE,
@@ -214,9 +213,7 @@ export class PaymentListComponent {
     );
   });
 
-  readonly canChangeStatus = computed(() =>
-    PAYMENT_STATUS_ROLES.includes(this.auth.currentUser()?.role ?? ''),
-  );
+  readonly canChangeStatus = computed(() => this.auth.capabilities().changePaymentStatus);
 
   /** The status change made in the dialog, shown until another transaction is opened. */
   private readonly selectedOverride = signal<Transaction | null>(null);

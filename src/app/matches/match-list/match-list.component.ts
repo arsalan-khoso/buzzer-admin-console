@@ -11,6 +11,7 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
+import { AuthService } from '../../core/auth/services/auth.service';
 import { catchError, debounceTime, map, of, skip, startWith, switchMap } from 'rxjs';
 import { ConfirmDialogComponent } from '../../common/components/confirm-dialog/confirm-dialog.component';
 import { ICONS_PATH } from '../../common/constants/navigation.constants';
@@ -45,6 +46,8 @@ const LOADING_STATE: ListState = { matches: [], totalPages: 1, isLoading: true, 
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MatchListComponent {
+  /** What the signed-in account may do; action buttons check it. */
+  readonly access = inject(AuthService).capabilities;
   private readonly matchesService = inject(MatchesService);
   private readonly layout = inject(LayoutService);
   private readonly search = this.layout.searchQuery;

@@ -9,7 +9,8 @@ import {
 import { AuthService } from '../services/auth.service';
 
 /**
- * Lets signed-in users through, loading their profile from GET /auth/me on the first visit.
+ * Lets signed-in users through, loading their role (GET /auth/me) and permissions
+ * (GET /users/:id/permissions) on the first visit, so pages render with the right actions.
  * An expired access token is renewed by the interceptor, so only a failed refresh ends here.
  */
 export const authGuard: CanActivateFn = (_route, state) => {
@@ -19,10 +20,11 @@ export const authGuard: CanActivateFn = (_route, state) => {
   if (!auth.isAuthenticated()) {
     return router.createUrlTree([LOGIN_ROUTE], { queryParams: { returnUrl: state.url } });
   }
-  if (auth.currentUser() && (!auth.isTokenExpired() || auth.canRefresh())) {
+  const hasSession = auth.currentUser() && auth.permissions() !== null;
+  if (hasSession && (!auth.isTokenExpired() || auth.canRefresh())) {
     return true;
   }
-  return auth.loadCurrentUser().pipe(
+  return auth.loadSession().pipe(
     map(() => true),
     catchError(() =>
       of(

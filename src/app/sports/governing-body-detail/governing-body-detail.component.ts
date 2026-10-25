@@ -2,6 +2,7 @@ import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
+import { AuthService } from '../../core/auth/services/auth.service';
 import { Observable, catchError, combineLatest, forkJoin, map, of, switchMap } from 'rxjs';
 import { BreadcrumbComponent } from '../../common/components/breadcrumb/breadcrumb.component';
 import { ConfirmDialogComponent } from '../../common/components/confirm-dialog/confirm-dialog.component';
@@ -52,6 +53,8 @@ interface PendingDelete {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GoverningBodyDetailComponent {
+  /** What the signed-in account may do; action buttons check it. */
+  readonly access = inject(AuthService).capabilities;
   private readonly hierarchy = inject(HierarchyService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);

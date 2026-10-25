@@ -6,6 +6,12 @@ export interface AuthUser {
   role: UserRole;
 }
 
+export interface UserPermissions {
+  userId: string;
+  role: UserRole;
+  permissions: string[];
+}
+
 export interface LoginCredentials {
   email: string;
   password: string;
