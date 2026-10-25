@@ -1,0 +1,210 @@
+<section class="page">
+  <div class="page__toolbar">
+    <span class="chip">Payments</span>
+  </div>
+
+  <div
+    class="payment-summary"
+    aria-label="Payment summary"
+    [attr.aria-busy]="isSummaryLoading()"
+    [class.payment-summary--loading]="isSummaryLoading()"
+  >
+    <div class="stat-card payment-summary__card payment-summary__card--gross">
+      <span class="stat-card__value">
+        {{ summary()?.grossRevenue ?? (isSummaryLoading() ? 'Loading…' : '—') }}
+      </span>
+      <span class="stat-card__label">Gross Revenue</span>
+    </div>
+    @for (row of statusTotals(); track row.status) {
+      <div class="stat-card payment-summary__card">
+        <span class="stat-card__value">
+          {{ summary() ? row.total : isSummaryLoading() ? 'Loading…' : '—' }}
+        </span>
+        <span [class]="'tag ' + statusTags[row.status]">{{ statusLabels[row.status] }}</span>
+        <span class="payment-summary__count">
+          @if (summary()) {
+            {{ row.count }} {{ row.count === 1 ? 'transaction' : 'transactions' }}
+          }
+        </span>
+      </div>
+    }
+  </div>
+  @if (summaryError()) {
+    <div class="payment-alert" role="alert">
+      <span>Summary could not be loaded. {{ summaryError() }}</span>
+      <button type="button" class="btn btn--small" (click)="retrySummary()">Try again</button>
+    </div>
+  }
+  @if (detailError() && !selected()) {
+    <div class="payment-alert" role="alert">
+      <span>Transaction could not be opened. {{ detailError() }}</span>
+      <button type="button" class="btn btn--small" (click)="closeDetail()">Dismiss</button>
+    </div>
+  }
+
+  <div class="payment-filters">
+    <div class="tabs" role="tablist" aria-label="Transaction status">
+      @for (tab of tabs; track tab.status) {
+        <button
+          type="button"
+          role="tab"
+          class="tabs__tab"
+          [class.tabs__tab--active]="view().status === tab.status"
+          [attr.aria-selected]="view().status === tab.status"
+          (click)="selectTab(tab.status)"
+        >
+          {{ tab.label }}
+        </button>
+      }
+    </div>
+    <div class="payment-filters__right">
+      <select
+        id="payment-currency"
+        class="input payment-filters__currency"
+        aria-label="Currency"
+        (change)="selectCurrency($event)"
+      >
+        <!-- [selected] per option: a [value] on the select is lost when options render later -->
+        <option value="" [selected]="!view().currency">All currencies</option>
+        @for (currency of currencies; track currency) {
+          <option [value]="currency" [selected]="currency === view().currency">
+            {{ currency }}
+          </option>
+        }
+      </select>
+      @if (hasFilters()) {
+        <button type="button" class="btn btn--small btn--ghost" (click)="clearFilters()">
+          Clear filters
+        </button>
+      }
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th scope="col">Reference</th>
+          <th scope="col">Customer</th>
+          <th scope="col">Description</th>
+          <th scope="col">Method</th>
+          <th scope="col" class="data-table__sortable" [attr.aria-sort]="sortState('amount')">
+            <button type="button" class="data-table__sort" (click)="sortBy('amount')">
+              Amount
+              <span
+                class="data-table__caret"
+                [class.data-table__caret--up]="sortState('amount') === 'ascending'"
+                [class.data-table__caret--idle]="sortState('amount') === 'none'"
+              ></span>
+            </button>
+          </th>
+          <th scope="col">Status</th>
+          <th scope="col" class="data-table__sortable" [attr.aria-sort]="sortState('createdAt')">
+            <button type="button" class="data-table__sort" (click)="sortBy('createdAt')">
+              Date
+              <span
+                class="data-table__caret"
+                [class.data-table__caret--up]="sortState('createdAt') === 'ascending'"
+                [class.data-table__caret--idle]="sortState('createdAt') === 'none'"
+              ></span>
+            </button>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (tx of transactions(); track tx.id) {
+          <tr
+            class="data-table__row--link"
+            tabindex="0"
+            [attr.aria-label]="'Open ' + tx.reference"
+            (click)="open(tx)"
+            (keydown.enter)="open(tx)"
+          >
+            <td class="payment-list__reference">{{ tx.reference }}</td>
+            <td [class.data-table__muted]="!tx.customer">{{ tx.customer || '—' }}</td>
+            <td [class.data-table__muted]="!tx.description">{{ tx.description || '—' }}</td>
+            <td>{{ methodLabel(tx.method) }}</td>
+            <td class="payment-list__amount">{{ tx.amountFormatted }}</td>
+            <td>
+              <span [class]="'tag ' + statusTags[tx.status]">{{ statusLabels[tx.status] }}</span>
+            </td>
+            <td class="payment-list__date">{{ tx.createdAt | date: 'MMM d, y, HH:mm' }}</td>
+          </tr>
+        } @empty {
+          <tr>
+            <td class="data-table__empty" colspan="7">
+              @if (isLoading()) {
+                Loading transactions…
+              } @else if (errorMessage()) {
+                <span class="payment-list__empty">
+                  {{ errorMessage() }}
+                  <button type="button" class="btn btn--small" (click)="retryList()">
+                    Try again
+                  </button>
+                </span>
+              } @else if (hasFilters()) {
+                <span class="payment-list__empty">
+                  No transactions match these filters.
+                  <button type="button" class="btn btn--small" (click)="clearFilters()">
+                    Clear filters
+                  </button>
+                </span>
+              } @else {
+                No transactions yet.
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <nav class="pagination" aria-label="Pagination">
+    <span class="pagination__total">
+      {{ total() }} {{ total() === 1 ? 'transaction' : 'transactions' }}
+    </span>
+    @if (totalPages() > 1) {
+      <button
+        type="button"
+        class="btn btn--small"
+        [disabled]="view().page === 1"
+        (click)="goToPage(view().page - 1)"
+      >
+        Previous
+      </button>
+      <span class="pagination__info">Page {{ view().page }} of {{ totalPages() }}</span>
+      <button
+        type="button"
+        class="btn btn--small"
+        [disabled]="view().page >= totalPages()"
+        (click)="goToPage(view().page + 1)"
+      >
+        Next
+      </button>
+    }
+  </nav>
+</section>
+
+@if (selected(); as tx) {
+  <app-transaction-dialog
+    [transaction]="tx"
+    [canChangeStatus]="canChangeStatus()"
+    [isConfirming]="pendingChange() !== null"
+    [errorMessage]="detailError()"
+    (statusRequested)="askStatusChange($event)"
+    (closed)="closeDetail()"
+  />
+}
+
+@if (pendingChange(); as pending) {
+  <app-confirm-dialog
+    title="Change Status"
+    [message]="changeMessage(pending)"
+    confirmLabel="Change Status"
+    cancelLabel="Go Back"
+    [isBusy]="isChanging()"
+    [errorMessage]="changeError()"
+    (confirmed)="confirmStatusChange()"
+    (cancelled)="pendingChange.set(null)"
+  />
+}
