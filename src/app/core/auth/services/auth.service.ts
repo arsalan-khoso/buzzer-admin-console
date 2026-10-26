@@ -1,15 +1,21 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { Observable, finalize, map, shareReplay, tap } from 'rxjs';
+import { Observable, catchError, finalize, map, of, shareReplay, switchMap, tap } from 'rxjs';
 import {
   ACCESS_TOKEN_KEY,
   AUTH_ENDPOINTS,
   REFRESH_TOKEN_KEY,
   TOKEN_EXPIRY_MARGIN_MS,
 } from '../../../auth/constants/auth.constants';
-import { AuthUser, LoginCredentials, LoginResult } from '../../../auth/models/auth.model';
+import {
+  AuthUser,
+  LoginCredentials,
+  LoginResult,
+  UserPermissions,
+} from '../../../auth/models/auth.model';
 import { API_BASE_URL, apiUrl } from '../../api.config';
 import { ApiResponse } from '../../models/api.model';
+import { accessFor } from '../access';
 
 /**
  * Holds the session: the short-lived access token, the refresh token used to renew it (both kept
@@ -27,6 +33,12 @@ export class AuthService {
   private pendingRefresh: Observable<string> | null = null;
 
   readonly currentUser = signal<AuthUser | null>(null);
+  /** From GET /users/:id/permissions; null until loaded for this session. */
+  readonly permissions = signal<string[] | null>(null);
+  /** What the account may do; nothing until the role and permissions are known. */
+  readonly capabilities = computed(() =>
+    accessFor(this.currentUser()?.role, this.permissions() ?? []),
+  );
   readonly isAuthenticated = computed(() => this.access() !== null || this.refreshToken() !== null);
 
   get accessToken(): string | null {
@@ -41,9 +53,32 @@ export class AuthService {
         tap((result) => {
           this.storeTokens(result.accessToken, result.refreshToken);
           this.currentUser.set(result.user);
+          // A new account: its permissions are loaded on the way in
+          this.permissions.set(null);
         }),
         map((result) => result.user),
       );
+  }
+
+  /**
+   * Role from GET /auth/me, then the permission list. If the list can't be loaded the console
+   * stays read-only rather than showing buttons that could fail.
+   */
+  loadSession(): Observable<AuthUser> {
+    return this.loadCurrentUser().pipe(
+      switchMap((user) =>
+        this.http
+          .get<ApiResponse<UserPermissions>>(
+            apiUrl(this.baseUrl, AUTH_ENDPOINTS.permissions(user.id)),
+          )
+          .pipe(
+            map((response) => response.data.permissions),
+            catchError(() => of<string[]>([])),
+            tap((permissions) => this.permissions.set(permissions)),
+            map(() => user),
+          ),
+      ),
+    );
   }
 
   loadCurrentUser(): Observable<AuthUser> {
@@ -99,6 +134,7 @@ export class AuthService {
   clearSession(): void {
     this.storeTokens(null, null);
     this.currentUser.set(null);
+    this.permissions.set(null);
   }
 
   /** True when the access token is missing or about to expire. */

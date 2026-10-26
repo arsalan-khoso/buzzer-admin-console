@@ -3,6 +3,8 @@ export const AUTH_ENDPOINTS = {
   me: 'auth/me',
   refresh: 'auth/refresh',
   logout: 'auth/logout',
+  /** GET users/:id/permissions */
+  permissions: (userId: string) => `users/${userId}/permissions`,
 } as const;
 
 export const ACCESS_TOKEN_KEY = 'accessToken';

@@ -14,7 +14,7 @@ import { ICONS_PATH } from '../../common/constants/navigation.constants';
 import { httpErrorMessage } from '../../common/utils/http-error.util';
 import { CompetitionDialogComponent } from '../components/competition-dialog/competition-dialog.component';
 import { AuthService } from '../../core/auth/services/auth.service';
-import { MEMBER_WRITE_ROLES, STAFF_CATEGORY_LABELS } from '../constants/sports.constants';
+import { STAFF_CATEGORY_LABELS } from '../constants/sports.constants';
 import {
   GoverningBody,
   Organisation,
@@ -58,16 +58,15 @@ interface RemoveConfig {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OrganisationDetailComponent {
+  /** What the signed-in account may do; action buttons check it. */
+  readonly access = inject(AuthService).capabilities;
   private readonly hierarchy = inject(HierarchyService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
 
   readonly iconsPath = ICONS_PATH;
   readonly staffLabels = STAFF_CATEGORY_LABELS;
-  private readonly auth = inject(AuthService);
-  readonly canManageMembers = computed(() =>
-    MEMBER_WRITE_ROLES.includes(this.auth.currentUser()?.role ?? ''),
-  );
+  readonly canManageMembers = computed(() => this.access().manageMembers);
 
   readonly sportId = signal('');
   readonly governingBodyId = signal('');

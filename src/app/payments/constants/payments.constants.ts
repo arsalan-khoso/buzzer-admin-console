@@ -44,6 +44,3 @@ export const PAYMENT_METHOD_LABELS: Record<string, string> = {
 
 /** Unknown sort fields make the backend fail with 500, so only these are sent. */
 export const TRANSACTION_SORT_FIELDS: TransactionSortField[] = ['createdAt', 'amount'];
-
-/** The backend lets ADMIN and OPERATOR change a transaction status (others get 403). */
-export const PAYMENT_STATUS_ROLES: readonly string[] = ['ADMIN', 'OPERATOR'];

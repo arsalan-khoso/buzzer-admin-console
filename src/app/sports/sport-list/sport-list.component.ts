@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@a
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { catchError, debounceTime, map, of, skip, startWith, switchMap } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
+import { AuthService } from '../../core/auth/services/auth.service';
 import { BulkImportDialogComponent } from '../components/bulk-import-dialog/bulk-import-dialog.component';
 import { ConfirmDialogComponent } from '../../common/components/confirm-dialog/confirm-dialog.component';
 import { ICONS_PATH } from '../../common/constants/navigation.constants';
@@ -30,6 +31,8 @@ const LOADING_STATE: ListState = { sports: [], totalPages: 1, isLoading: true, e
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SportListComponent {
+  /** What the signed-in account may do; action buttons check it. */
+  readonly access = inject(AuthService).capabilities;
   private readonly sportsService = inject(SportsService);
   private readonly search = inject(LayoutService).searchQuery;
   private readonly router = inject(Router);
