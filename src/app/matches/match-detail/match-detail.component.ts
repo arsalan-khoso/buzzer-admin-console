@@ -2,6 +2,7 @@ import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
+import { AuthService } from '../../core/auth/services/auth.service';
 import {
   Observable,
   catchError,
@@ -64,6 +65,8 @@ const LIST_QUERY_KEYS = ['status', 'page'];
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MatchDetailComponent {
+  /** What the signed-in account may do; action buttons check it. */
+  readonly access = inject(AuthService).capabilities;
   private readonly matchesService = inject(MatchesService);
   private readonly live = inject(MatchLiveService);
   private readonly route = inject(ActivatedRoute);

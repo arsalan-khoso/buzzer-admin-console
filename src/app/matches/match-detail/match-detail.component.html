@@ -52,20 +52,24 @@
       </dl>
 
       <div class="match-card__actions">
-        @for (action of actions(); track action.status) {
-          <button
-            type="button"
-            class="btn btn--small"
-            [class.btn--primary]="action.status === 'LIVE'"
-            [disabled]="isChanging()"
-            (click)="runAction(action)"
-          >
-            {{ action.label }}
-          </button>
-        } @empty {
-          <span class="match-card__final">
-            {{ statusLabels[match.status] }} is a final status, so it cannot change.
-          </span>
+        @if (!access().manageMatches) {
+          <span class="match-card__final">View only: this account can't change matches.</span>
+        } @else {
+          @for (action of actions(); track action.status) {
+            <button
+              type="button"
+              class="btn btn--small"
+              [class.btn--primary]="action.status === 'LIVE'"
+              [disabled]="isChanging()"
+              (click)="runAction(action)"
+            >
+              {{ action.label }}
+            </button>
+          } @empty {
+            <span class="match-card__final">
+              {{ statusLabels[match.status] }} is a final status, so it cannot change.
+            </span>
+          }
         }
       </div>
       @if (statusError() && !pendingAction()) {
@@ -73,7 +77,7 @@
       }
     </header>
 
-    @if (isLive()) {
+    @if (isLive() && access().manageMatches) {
       <section class="match-detail__events" aria-labelledby="add-event-title">
         <h3 id="add-event-title" class="match-detail__events-title">Add Event</h3>
         <app-match-event-form

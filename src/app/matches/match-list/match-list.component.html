@@ -2,16 +2,18 @@
   <div class="page__toolbar">
     <span class="chip">Matches</span>
     <span class="page__actions">
-      <button type="button" class="btn btn--small" (click)="openSchedule()">
-        <img
-          [src]="iconsPath + '/ic_plus_circle.svg'"
-          width="16"
-          height="16"
-          alt=""
-          aria-hidden="true"
-        />
-        Schedule Match
-      </button>
+      @if (access().manageMatches) {
+        <button type="button" class="btn btn--small" (click)="openSchedule()">
+          <img
+            [src]="iconsPath + '/ic_plus_circle.svg'"
+            width="16"
+            height="16"
+            alt=""
+            aria-hidden="true"
+          />
+          Schedule Match
+        </button>
+      }
     </span>
   </div>
 
@@ -87,34 +89,38 @@
               (click)="$event.stopPropagation()"
               (keydown.enter)="$event.stopPropagation()"
             >
-              <button
-                type="button"
-                class="icon-btn"
-                (click)="openEdit(match)"
-                [attr.aria-label]="'Edit ' + matchName(match)"
-              >
-                <img
-                  [src]="iconsPath + '/ic_edit.svg'"
-                  width="18"
-                  height="18"
-                  alt=""
-                  aria-hidden="true"
-                />
-              </button>
-              <button
-                type="button"
-                class="icon-btn"
-                (click)="askDelete(match)"
-                [attr.aria-label]="'Delete ' + matchName(match)"
-              >
-                <img
-                  [src]="iconsPath + '/ic_delete.svg'"
-                  width="18"
-                  height="18"
-                  alt=""
-                  aria-hidden="true"
-                />
-              </button>
+              @if (access().manageMatches) {
+                <button
+                  type="button"
+                  class="icon-btn"
+                  (click)="openEdit(match)"
+                  [attr.aria-label]="'Edit ' + matchName(match)"
+                >
+                  <img
+                    [src]="iconsPath + '/ic_edit.svg'"
+                    width="18"
+                    height="18"
+                    alt=""
+                    aria-hidden="true"
+                  />
+                </button>
+                <button
+                  type="button"
+                  class="icon-btn"
+                  (click)="askDelete(match)"
+                  [attr.aria-label]="'Delete ' + matchName(match)"
+                >
+                  <img
+                    [src]="iconsPath + '/ic_delete.svg'"
+                    width="18"
+                    height="18"
+                    alt=""
+                    aria-hidden="true"
+                  />
+                </button>
+              } @else {
+                <span class="data-table__muted">View only</span>
+              }
             </td>
           </tr>
         } @empty {

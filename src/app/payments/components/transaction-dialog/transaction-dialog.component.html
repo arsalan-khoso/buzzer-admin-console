@@ -1,0 +1,87 @@
+<div class="dialog-backdrop"></div>
+<section
+  class="dialog transaction-dialog"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="transaction-dialog-title"
+>
+  <div class="dialog__header">
+    <h2 id="transaction-dialog-title" class="dialog__title">Transaction</h2>
+    <button type="button" class="dialog__close" (click)="closed.emit()" aria-label="Close">
+      <img src="assets/icons/ic_close.svg" width="20" height="20" alt="" aria-hidden="true" />
+    </button>
+  </div>
+
+  @let tx = transaction();
+  <div class="transaction-dialog__amount">
+    <span class="transaction-dialog__value">{{ tx.amountFormatted }}</span>
+    <span [class]="'tag ' + statusTags[tx.status]">{{ statusLabels[tx.status] }}</span>
+  </div>
+
+  <dl class="transaction-dialog__meta">
+    <div class="transaction-dialog__row">
+      <dt>Reference</dt>
+      <dd>{{ tx.reference }}</dd>
+    </div>
+    <div class="transaction-dialog__row">
+      <dt>Customer</dt>
+      <dd [class.data-table__muted]="!tx.customer">{{ tx.customer || '—' }}</dd>
+    </div>
+    <div class="transaction-dialog__row">
+      <dt>Description</dt>
+      <dd [class.data-table__muted]="!tx.description">{{ tx.description || '—' }}</dd>
+    </div>
+    <div class="transaction-dialog__row">
+      <dt>Method</dt>
+      <dd>{{ methodLabel(tx.method) }}</dd>
+    </div>
+    <div class="transaction-dialog__row">
+      <dt>Currency</dt>
+      <dd>{{ tx.currency }}</dd>
+    </div>
+    <div class="transaction-dialog__row">
+      <dt>Created</dt>
+      <dd>{{ tx.createdAt | date: "MMM d, y. 'at' HH:mm" }}</dd>
+    </div>
+    <div class="transaction-dialog__row">
+      <dt>Updated</dt>
+      <dd>{{ tx.updatedAt | date: "MMM d, y. 'at' HH:mm" }}</dd>
+    </div>
+    <div class="transaction-dialog__row">
+      <dt>ID</dt>
+      <dd class="transaction-dialog__id">{{ tx.id }}</dd>
+    </div>
+  </dl>
+
+  @if (canChangeStatus()) {
+    <div class="transaction-dialog__status">
+      <div class="field">
+        <label class="field__label" for="transaction-status">Change status:</label>
+        <select id="transaction-status" class="input" (change)="onStatusPicked($event)">
+          <option value="" [selected]="!nextStatus()">Select new status</option>
+          @for (status of statusOptions(); track status) {
+            <option [value]="status" [selected]="status === nextStatus()">
+              {{ statusLabels[status] }}
+            </option>
+          }
+        </select>
+      </div>
+      <button
+        type="button"
+        class="btn btn--primary"
+        [disabled]="!nextStatus()"
+        (click)="requestChange()"
+      >
+        Change Status
+      </button>
+    </div>
+  }
+
+  @if (errorMessage()) {
+    <p class="dialog__error" role="alert">{{ errorMessage() }}</p>
+  }
+
+  <div class="dialog__actions">
+    <button type="button" class="btn" (click)="closed.emit()">Close</button>
+  </div>
+</section>

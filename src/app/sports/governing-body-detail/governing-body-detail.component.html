@@ -11,36 +11,38 @@
             }}</span>
             {{ body.name }}
           </h2>
-          <span class="entity-card__actions">
-            <button
-              type="button"
-              class="icon-btn"
-              (click)="openEditGoverningBody(body)"
-              [attr.aria-label]="'Edit ' + body.name"
-            >
-              <img
-                [src]="iconsPath + '/ic_edit.svg'"
-                width="18"
-                height="18"
-                alt=""
-                aria-hidden="true"
-              />
-            </button>
-            <button
-              type="button"
-              class="icon-btn"
-              (click)="askDeleteGoverningBody(body)"
-              [attr.aria-label]="'Delete ' + body.name"
-            >
-              <img
-                [src]="iconsPath + '/ic_delete.svg'"
-                width="18"
-                height="18"
-                alt=""
-                aria-hidden="true"
-              />
-            </button>
-          </span>
+          @if (access().manageCatalogue) {
+            <span class="entity-card__actions">
+              <button
+                type="button"
+                class="icon-btn"
+                (click)="openEditGoverningBody(body)"
+                [attr.aria-label]="'Edit ' + body.name"
+              >
+                <img
+                  [src]="iconsPath + '/ic_edit.svg'"
+                  width="18"
+                  height="18"
+                  alt=""
+                  aria-hidden="true"
+                />
+              </button>
+              <button
+                type="button"
+                class="icon-btn"
+                (click)="askDeleteGoverningBody(body)"
+                [attr.aria-label]="'Delete ' + body.name"
+              >
+                <img
+                  [src]="iconsPath + '/ic_delete.svg'"
+                  width="18"
+                  height="18"
+                  alt=""
+                  aria-hidden="true"
+                />
+              </button>
+            </span>
+          }
         </div>
         <dl class="entity-card__meta">
           <div>
@@ -75,16 +77,18 @@
 
   <div class="section-header">
     <h3>Competitions</h3>
-    <button type="button" class="btn btn--small" (click)="openAddOrganisation()">
-      <img
-        [src]="iconsPath + '/ic_plus_circle.svg'"
-        width="16"
-        height="16"
-        alt=""
-        aria-hidden="true"
-      />
-      Add Organisation
-    </button>
+    @if (access().manageCatalogue) {
+      <button type="button" class="btn btn--small" (click)="openAddOrganisation()">
+        <img
+          [src]="iconsPath + '/ic_plus_circle.svg'"
+          width="16"
+          height="16"
+          alt=""
+          aria-hidden="true"
+        />
+        Add Organisation
+      </button>
+    }
   </div>
 
   <div class="table-wrap">
@@ -111,34 +115,38 @@
               (click)="$event.stopPropagation()"
               (keydown.enter)="$event.stopPropagation()"
             >
-              <button
-                type="button"
-                class="icon-btn"
-                (click)="openEditOrganisation(organisation)"
-                [attr.aria-label]="'Edit ' + organisation.name"
-              >
-                <img
-                  [src]="iconsPath + '/ic_edit.svg'"
-                  width="18"
-                  height="18"
-                  alt=""
-                  aria-hidden="true"
-                />
-              </button>
-              <button
-                type="button"
-                class="icon-btn"
-                (click)="askDeleteOrganisation(organisation)"
-                [attr.aria-label]="'Delete ' + organisation.name"
-              >
-                <img
-                  [src]="iconsPath + '/ic_delete.svg'"
-                  width="18"
-                  height="18"
-                  alt=""
-                  aria-hidden="true"
-                />
-              </button>
+              @if (access().manageCatalogue) {
+                <button
+                  type="button"
+                  class="icon-btn"
+                  (click)="openEditOrganisation(organisation)"
+                  [attr.aria-label]="'Edit ' + organisation.name"
+                >
+                  <img
+                    [src]="iconsPath + '/ic_edit.svg'"
+                    width="18"
+                    height="18"
+                    alt=""
+                    aria-hidden="true"
+                  />
+                </button>
+                <button
+                  type="button"
+                  class="icon-btn"
+                  (click)="askDeleteOrganisation(organisation)"
+                  [attr.aria-label]="'Delete ' + organisation.name"
+                >
+                  <img
+                    [src]="iconsPath + '/ic_delete.svg'"
+                    width="18"
+                    height="18"
+                    alt=""
+                    aria-hidden="true"
+                  />
+                </button>
+              } @else {
+                <span class="data-table__muted">View only</span>
+              }
             </td>
           </tr>
         } @empty {

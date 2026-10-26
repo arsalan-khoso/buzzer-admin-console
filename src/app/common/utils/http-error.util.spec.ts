@@ -25,4 +25,10 @@ describe('httpErrorMessage', () => {
       'Your account does not have permission to do this.',
     );
   });
+
+  it('should explain a 429 with a retry hint', () => {
+    expect(httpErrorMessage(new HttpErrorResponse({ status: 429 }))).toBe(
+      'Too many requests (the limit is 300 a minute). Wait a moment, then try again.',
+    );
+  });
 });

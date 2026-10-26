@@ -3,7 +3,7 @@ import { authGuard, guestGuard } from './core/auth/guards/auth.guard';
 import { NAV_GROUPS } from './common/constants/navigation.constants';
 
 /** Sections with their own pages; every other sidebar link shows the placeholder. */
-const BUILT_SECTIONS = ['/sports', '/matches'];
+const BUILT_SECTIONS = ['/sports', '/matches', '/payments'];
 
 const sectionRoutes: Routes = NAV_GROUPS.flatMap((group) => group.items)
   .filter((item) => !BUILT_SECTIONS.includes(item.route))
@@ -39,6 +39,10 @@ export const routes: Routes = [
       {
         path: 'matches',
         loadChildren: () => import('./matches/matches.routes').then((m) => m.MATCHES_ROUTES),
+      },
+      {
+        path: 'payments',
+        loadChildren: () => import('./payments/payments.routes').then((m) => m.PAYMENTS_ROUTES),
       },
       ...sectionRoutes,
     ],

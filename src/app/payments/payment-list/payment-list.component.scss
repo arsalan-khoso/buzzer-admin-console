@@ -1,0 +1,119 @@
+.payment-summary {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--space-3);
+
+  &__card {
+    min-height: 96px;
+    padding: var(--space-4) var(--space-3);
+
+    .stat-card__value {
+      font-size: var(--font-size-2xl);
+      font-variant-numeric: tabular-nums;
+    }
+
+    &--gross {
+      border-color: var(--color-accent);
+
+      .stat-card__value {
+        color: var(--color-accent);
+      }
+    }
+  }
+
+  &__card {
+    gap: var(--space-2);
+  }
+
+  &__count {
+    min-height: 16px;
+    color: var(--color-text-muted);
+    font-size: var(--font-size-xs);
+  }
+
+  &--loading .stat-card__value {
+    opacity: 0.5;
+  }
+}
+
+.payment-alert {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid rgba(236, 25, 60, 0.4);
+  border-radius: var(--radius-md);
+  background-color: rgba(236, 25, 60, 0.08);
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+}
+
+.payment-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-3);
+
+  .tabs {
+    flex: 1 1 auto;
+  }
+
+  &__right {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  &__currency {
+    width: 170px;
+  }
+}
+
+.payment-list {
+  &__reference {
+    font-weight: var(--font-weight-medium);
+    white-space: nowrap;
+  }
+
+  &__amount {
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  &__date {
+    white-space: nowrap;
+  }
+
+  &__empty {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-3);
+  }
+}
+
+.pagination__total {
+  margin-right: auto;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+// A column that is not the current sort shows a faint caret
+.data-table__caret--idle {
+  opacity: 0.35;
+}
+
+@media (max-width: 1200px) {
+  .payment-summary {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .payment-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

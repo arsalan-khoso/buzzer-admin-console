@@ -1,6 +1,9 @@
 import { HttpErrorResponse } from '@angular/common/http';
 
 const DEFAULT_MESSAGE = 'Something went wrong. Please try again.';
+export const FORBIDDEN_MESSAGE = 'Your account does not have permission to do this.';
+export const TOO_MANY_REQUESTS_MESSAGE =
+  'Too many requests (the limit is 300 a minute). Wait a moment, then try again.';
 
 /** Turns an HTTP error into a message that can be shown to the user. */
 export function httpErrorMessage(error: unknown, fallback = DEFAULT_MESSAGE): string {
@@ -11,7 +14,10 @@ export function httpErrorMessage(error: unknown, fallback = DEFAULT_MESSAGE): st
     return 'Cannot reach the server. Check your connection and try again.';
   }
   if (error.status === 403) {
-    return 'Your account does not have permission to do this.';
+    return FORBIDDEN_MESSAGE;
+  }
+  if (error.status === 429) {
+    return TOO_MANY_REQUESTS_MESSAGE;
   }
   const body = error.error as {
     error?: { message?: string; details?: Record<string, string[]> };

@@ -2,17 +2,23 @@
   <div class="page__toolbar">
     <span class="chip">Sport</span>
     <span class="page__actions">
-      <button type="button" class="btn btn--small" (click)="isImportOpen.set(true)">Import</button>
-      <button type="button" class="btn btn--small" (click)="openAdd()">
-        <img
-          [src]="iconsPath + '/ic_plus_circle.svg'"
-          width="16"
-          height="16"
-          alt=""
-          aria-hidden="true"
-        />
-        Add Sport
-      </button>
+      @if (access().manageCatalogue) {
+        <button type="button" class="btn btn--small" (click)="isImportOpen.set(true)">
+          Import
+        </button>
+      }
+      @if (access().manageCatalogue) {
+        <button type="button" class="btn btn--small" (click)="openAdd()">
+          <img
+            [src]="iconsPath + '/ic_plus_circle.svg'"
+            width="16"
+            height="16"
+            alt=""
+            aria-hidden="true"
+          />
+          Add Sport
+        </button>
+      }
     </span>
   </div>
 
@@ -101,34 +107,38 @@
               (click)="$event.stopPropagation()"
               (keydown.enter)="$event.stopPropagation()"
             >
-              <button
-                type="button"
-                class="icon-btn"
-                (click)="openEdit(sport)"
-                [attr.aria-label]="'Edit ' + sport.name"
-              >
-                <img
-                  [src]="iconsPath + '/ic_edit.svg'"
-                  width="18"
-                  height="18"
-                  alt=""
-                  aria-hidden="true"
-                />
-              </button>
-              <button
-                type="button"
-                class="icon-btn"
-                (click)="askDelete(sport)"
-                [attr.aria-label]="'Delete ' + sport.name"
-              >
-                <img
-                  [src]="iconsPath + '/ic_delete.svg'"
-                  width="18"
-                  height="18"
-                  alt=""
-                  aria-hidden="true"
-                />
-              </button>
+              @if (access().manageCatalogue) {
+                <button
+                  type="button"
+                  class="icon-btn"
+                  (click)="openEdit(sport)"
+                  [attr.aria-label]="'Edit ' + sport.name"
+                >
+                  <img
+                    [src]="iconsPath + '/ic_edit.svg'"
+                    width="18"
+                    height="18"
+                    alt=""
+                    aria-hidden="true"
+                  />
+                </button>
+                <button
+                  type="button"
+                  class="icon-btn"
+                  (click)="askDelete(sport)"
+                  [attr.aria-label]="'Delete ' + sport.name"
+                >
+                  <img
+                    [src]="iconsPath + '/ic_delete.svg'"
+                    width="18"
+                    height="18"
+                    alt=""
+                    aria-hidden="true"
+                  />
+                </button>
+              } @else {
+                <span class="data-table__muted">View only</span>
+              }
             </td>
           </tr>
         } @empty {

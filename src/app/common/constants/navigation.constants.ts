@@ -22,7 +22,10 @@ export const NAV_GROUPS: NavGroup[] = [
   },
   {
     label: 'Finance',
-    items: [{ label: 'Referrals', route: '/referrals', icon: 'ic_referrals' }],
+    items: [
+      { label: 'Payments', route: '/payments', icon: 'ic_payments' },
+      { label: 'Referrals', route: '/referrals', icon: 'ic_referrals' },
+    ],
   },
   {
     label: 'System',
